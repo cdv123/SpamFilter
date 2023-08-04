@@ -15,6 +15,9 @@ trainingData = []
 testData = []
 stop_words = set(stopwords.words('english'))
 
+
+
+#generalise function into load data
 def loadTrainingData():
     punc = '''!()-[]{};:'"\,<>./?@#$%^&*_~0123456789'''
     stop_words = set(stopwords.words('english'))
