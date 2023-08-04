@@ -1,5 +1,6 @@
 import csv
 # analysis on both training data and test data to make sure both have similar ratio of spam to ham
+# Testing
 spamCountTest = 0
 hamCountTest = 0
 with open("./Dataset/test-data.csv") as file:
