@@ -18,6 +18,7 @@ hamWordsList = []
 spamCount = 0
 length = len(trainingData)
 hamCount = 0
+correctCount =0
 for row in range(length):
     rowWords = trainingData[row].split(" ")
     if spamList[row] == "spam":
@@ -57,12 +58,10 @@ for i in range(0,len(word_count)):
 wordProbSpam = {}
 wordProbHam = {}
 for i in mostCommonWords:
-    wordProbSpam[i] = (spamWordsList.count(i))/(spamCount)
-    wordProbHam[i] = (hamWordsList.count(i))/(hamCount)
-    print(wordProbSpam[i],i)
-    print(wordProbHam[i],i)
-    print("h")
-correctCount = 0
+    wordProbSpam[i] = (spamWordsList.count(i))/(spamCount+len(vocab))
+    wordProbHam[i] = (hamWordsList.count(i))/(hamCount+len(vocab))
+print({k: v for k, v in sorted(wordProbSpam.items(), key=lambda item: item[1])})
+print({k: v for k, v in sorted(wordProbHam.items(), key=lambda item: item[1])})
 incorrectCount = 0
 isSpam = True
 testData,spamTestList = loadSMS('SMSTest.csv')
@@ -70,14 +69,16 @@ testData,spamTestList = loadSMS('SMSTest.csv')
 # with open("./Dataset/test-data.csv") as file:
 #     testingDataCSV = list(csv.reader(file))
 for i in range(len(testData)):
-    hamProb = 0.5
-    spamProb = 0.5
-    for j in testData[i]:
-        if wordProbHam.get(j) == None:  
-            wordProbHam[j] = 1/2
-            wordProbSpam[j] = 1/2
-        hamProb*=wordProbHam[j]
-        spamProb*= wordProbSpam[j]
+    hamProb = 0.85
+    spamProb = 0.15
+    row = testData[i].split(" ")
+    for j in row:
+        if j != '':
+            if wordProbHam.get(j) == None or wordProbHam.get(j) == 0:  
+                wordProbHam[j] = 1/2
+                wordProbSpam[j] = 1/2
+            hamProb*=wordProbHam[j]
+            spamProb*= wordProbSpam[j]
     if hamProb > spamProb:
         isSpam = False
     else:
