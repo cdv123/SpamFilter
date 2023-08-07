@@ -61,4 +61,5 @@ with open("./Dataset/training-data.csv") as file:
         else:
             incorrectCount+=1
 accuracy = correctCount/(incorrectCount+correctCount)
+#random comment
 print(accuracy)
