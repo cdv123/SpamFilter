@@ -1,19 +1,34 @@
 import numpy as np
-from sklearn.linear_model import LinearRegression
+import datetime
 import torch
 import torch.optim as optim
 import torch.nn as nn
-from torch.utils.data import Dataset, TensorDataset, DataLoader
-from torch.utils.data.dataset import random_split
+import torch.functional as F
+from torch.utils.data import DataLoader, TensorDataset, random_split
 from torch.utils.tensorboard import SummaryWriter
-
 import matplotlib.pyplot as plt
 
-#Model
-model = nn.Sequential(
-    nn.Linear(1, 1)
-)
-optim.Adam(model.parameters(), lr = 0.0)
+#framework from StepByStep class by Daniel Voigt Godoy https://github.com/dvgodoy/PyTorchStepByStep
 
-our_model = 
-#One-hot encoding
+plt.style.use('fivethirtyeight')
+
+class StepByStep(object):
+    def __init__(self,model,loss_fn,optimizer):
+        self.model = model
+        self.loss_fn = loss_fn
+        self.optimizer = optimizer
+        self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
+        self.model.to(self.device)
+        #attributes defined later on but not needed immediately
+        self.train_loader = None
+        self.val_loader = None
+        self.writer = None
+    #allows user to specify a different device
+    def to(self,device):
+        try:
+            self.device = device
+            self.model.to(self.device)
+        except RuntimeError:
+            self.device = ('cuda' if torch.cuda.is_available() else 'cpu')
+            print(f"Couldn't send it to {device}, sending it to {self.device} instead.")
+            self.model.to(self.device)
