@@ -1,22 +1,26 @@
 import numpy as np
-# from sklearn.linear_model import LinearRegression
-# import torch
-# import torch.optim as optim
-# import torch.nn as nn
-# from torch.utils.data import Dataset, TensorDataset, DataLoader
-# from torch.utils.data.dataset import random_split
-# from torch.utils.tensorboard import SummaryWriter
-# import matplotlib.pyplot as plt
+from sklearn.linear_model import LinearRegression
+import torch
+import torch.optim as optim
+import torch.nn as nn
+from torch.utils.data import Dataset, TensorDataset, DataLoader
+from torch.utils.data.dataset import random_split
+from torch.utils.tensorboard import SummaryWriter
+import matplotlib.pyplot as plt
+from neuralNetwork import StepByStep
 from simplifyDataset import loadSMS
 from collections import Counter
 
 
-#Model
-# model = nn.Sequential(
-#     nn.Linear(1, 1)
-# )
-# optim.Adam(model.parameters(), lr = 0.0)
-
+# Model
+model = nn.Sequential(
+    nn.Linear(300, 1)
+)
+loss_fn = nn.BCEWithLogitsLoss()
+optimizer = optim.Adam(model.parameters(), lr = 0.01)
+our_model = StepByStep(model, loss_fn, optimizer)
+our_model.set_loaders(train_loader, val_loader)
+our_model.train(100)
 #This code used https://datajenius.com/2022/03/13/a-deep-dive-into-nlp-tokenization-encoding-word-embeddings-sentence-embeddings-word2vec-bert/ as a resource, but different application
 
 #Probality to value:
