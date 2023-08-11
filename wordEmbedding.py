@@ -12,15 +12,7 @@ from simplifyDataset import loadSMS
 from collections import Counter
 
 
-# Model
-model = nn.Sequential(
-    nn.Linear(300, 1)
-)
-loss_fn = nn.BCEWithLogitsLoss()
-optimizer = optim.Adam(model.parameters(), lr = 0.01)
-our_model = StepByStep(model, loss_fn, optimizer)
-our_model.set_loaders(train_loader, val_loader)
-our_model.train(100)
+
 #This code used https://datajenius.com/2022/03/13/a-deep-dive-into-nlp-tokenization-encoding-word-embeddings-sentence-embeddings-word2vec-bert/ as a resource, but different application
 
 #Probality to value:
@@ -53,14 +45,57 @@ def oneHotEncode(dataset,mostCommonWords):
                 oneHot[i][j] = 1
     return oneHot
 
-trainingData,spamList = loadSMS('SMSSpamcollection.csv')
+def convertSpamToBinary(spamList):
+    for i in range(len(spamList)):
+        if spamList[i] == 'ham':
+            spamList[i] = 0
+        else:
+            spamList[i] = 1
+    return spamList
+trainingData,spamListTrain = loadSMS('SMSSpamcollection.csv')
+valData,spamListVal = loadSMS('SMSVal.csv')
+testData,spamListTest = loadSMS('SMSTest.csv')
+spamListTrain = np.array(convertSpamToBinary(spamListTrain))
+spamListTrain = spamListTrain.reshape(-1,1)
+spamListVal = np.array(convertSpamToBinary(spamListVal))
+spamListVal = spamListVal.reshape(-1,1)
+spamListTest = np.array(convertSpamToBinary(spamListTest))
+spamListTest.reshape(-1,1)
 mostCommonWords = getMostCommonWords(trainingData,300)
-oneHot = oneHotEncode(trainingData,mostCommonWords)
-for i in range(len(trainingData)):
-    print(trainingData[i],oneHot[i])
-
+oneHotTrain = oneHotEncode(trainingData,mostCommonWords).values()
+oneHotTrain = np.array([np.array(i) for i in oneHotTrain])
+oneHotVal = oneHotEncode(valData,mostCommonWords).values()
+oneHotVal = np.array([np.array(i) for i in oneHotVal])
+oneHotTest = oneHotEncode(testData,mostCommonWords).values()
+oneHotTest = np.array([np.array(i) for i in oneHotTest])
 # Second implementation with Vectors using word2Vec
 
 # Third implementation with Vectors using custom implementation
 
 # Fourth implementation with BERTft
+
+
+# Model
+model = nn.Sequential(
+    nn.Linear(300, 1)
+)
+loss_fn = nn.BCEWithLogitsLoss()
+optimizer = optim.Adam(model.parameters(), lr = 0.01)
+my_model = StepByStep(model, loss_fn, optimizer)
+oneHotTrain = torch.as_tensor(oneHotTrain).float()
+spamListTrain = torch.as_tensor(spamListTrain).float()
+oneHotVal = torch.as_tensor(oneHotVal).float()
+spamListVal = torch.as_tensor(spamListVal).float()
+oneHotTest = torch.as_tensor(oneHotTest).float()
+spamListTest = torch.as_tensor(oneHotTest).float()
+train_dataset = TensorDataset(oneHotTrain,spamListTrain)
+val_dataset = TensorDataset(oneHotVal,spamListVal)
+test_dataset = TensorDataset(oneHotTest,spamListTest)
+train_loader = DataLoader(dataset=train_dataset, batch_size=32, shuffle=True)
+val_loader = DataLoader(dataset=val_dataset, batch_size=32)
+my_model.set_loaders(train_loader, val_loader)
+my_model.train(100)
+fig = my_model.plot_losses()
+plt.show()
+my_model.eval()
+out = my_model(test_dataset)

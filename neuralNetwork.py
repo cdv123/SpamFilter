@@ -30,7 +30,7 @@ class StepByStep(object):
         #create train_step function for model
         self.train_step_fn = self._make_train_step_fn()
         #create val_step function for model and loss
-        self.val_step_fun = self._make_val_step_fn()
+        self.val_step_fn = self._make_val_step_fn()
     #allows user to specify a different device
     def to(self,device):
         try:
@@ -147,28 +147,6 @@ class StepByStep(object):
         if self.writer:
             # Flushes the writer
             self.writer.flush()
-    def save_checkpoint(self, filename):
-        # Builds dictionary with all elements for resuming training
-        checkpoint = {
-        'epoch': self.total_epochs,
-        'model_state_dict': self.model.state_dict(),
-        'optimizer_state_dict': self.optimizer.state_dict(),
-        'loss': self.losses,
-        'val_loss': self.val_losses
-        }
-        torch.save(checkpoint, filename)
-    def load_checkpoint(self, filename):
-        # Loads dictionary
-        checkpoint = torch.load(filename)
-        # Restore state for model and optimizer
-        self.model.load_state_dict(checkpoint['model_state_dict'])
-        self.optimizer.load_state_dict(
-        checkpoint['optimizer_state_dict']
-        )
-        self.total_epochs = checkpoint['epoch']
-        self.losses = checkpoint['loss']
-        self.val_losses = checkpoint['val_loss']
-        self.model.train() # always use TRAIN for resuming training
     def predict(self, x):
         # Set it to evaluation mode for predictions
         self.model.eval()
