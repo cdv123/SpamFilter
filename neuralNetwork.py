@@ -8,7 +8,7 @@ from torch.utils.data import DataLoader, TensorDataset, random_split
 from torch.utils.tensorboard import SummaryWriter
 import matplotlib.pyplot as plt
 
-#framework from StepByStep class by Daniel Voigt Godoy https://github.com/dvgodoy/PyTorchStepByStep
+#framework from StepByStep class by Daniel Voigt Godoy https://github.com/dvgodoy/PyTorchStepByStep but slightly edited
 
 plt.style.use('fivethirtyeight')
 
@@ -17,7 +17,7 @@ class StepByStep(object):
         self.model = model
         self.loss_fn = loss_fn
         self.optimizer = optimizer
-        self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
+        self.device = 'cpu'
         self.model.to(self.device)
         #attributes defined later on but not needed immediately
         self.train_loader = None
@@ -37,7 +37,7 @@ class StepByStep(object):
             self.device = device
             self.model.to(self.device)
         except RuntimeError:
-            self.device = ('cuda' if torch.cuda.is_available() else 'cpu')
+            self.device = 'cpu'
             print(f"Couldn't send it to {device}, sending it to {self.device} instead.")
             self.model.to(self.device)
     #allows user to load training data and validation data (optional)
