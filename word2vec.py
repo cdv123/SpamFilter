@@ -40,7 +40,7 @@ def sentenceEmbedding(data,spamList):
         length = 0
         for j in row:
             try:
-                sentence = np.add(sentence,word2vec[j])
+                sentence = np.add(sentence,np.array(word2vec[j]))
                 length+=1
             except:
                 pass
@@ -65,42 +65,57 @@ def convertSpamToBinary(spamList):
             spamList[i] = 1
     return spamList
 
-print(sentenceEmbedding(trainingData,trainingSpamList)[0])
-
+trainSentences = sentenceEmbedding(trainingData,trainingSpamList)
+trainingSpamList = np.array(convertSpamToBinary(trainingSpamList))
+trainingSpamList = trainingSpamList.reshape(-1,1)
+trainSentences = np.array(trainSentences)
+valSentences = sentenceEmbedding(valData,valSpamList)
+valSpamList = np.array(convertSpamToBinary(valSpamList))
+valSpamList = valSpamList.reshape(-1,1)
+valSentences = np.array(valSentences)
+testSentences = sentenceEmbedding(testData,testSpamList)
+testSpamList = convertSpamToBinary(testSpamList)
+testSentences = np.array([np.array(i) for i in testSentences])
 # Model
-# model = nn.Sequential(
-#     nn.Linear(300, 1)
-# )
-# loss_fn = nn.BCEWithLogitsLoss()
-# model.set_loaders(train_loader, val_loader)
-# my_model.train(100)
-# fig = my_model.plot_losses()
-# # plt.show()
-# my_model.model.eval()
-# out = my_model.model(oneHotTest)
-# print(out)
-# prob_sigmoid = torch.sigmoid(out).squeeze().tolist()
-# predictions = []
-# for i in prob_sigmoid:
-#     if i > 0.5:
-#         predictions.append(1)
-#     else:
-#         predictions.append(0)
-# correct = 0
-# for i in range(len(predictions)):
-#     if predictions[i] == spamListTest[i]:
-#         correct+=1
-# optimizer = optim.Adam(model.parameters(), lr = 0.01)
-# my_model = StepByStep(model, loss_fn, optimizer)
-# oneHotTrain = torch.as_tensor(oneHotTrain).float()
-# spamListTrain = torch.as_tensor(spamListTrain).float()
-# oneHotVal = torch.as_tensor(oneHotVal).float()
-# spamListVal = torch.as_tensor(spamListVal).float()
-# oneHotTest = torch.as_tensor(oneHotTest).float()
-# # spamListTest = torch.as_tensor(oneHotTest).float()
-# train_dataset = TensorDataset(oneHotTrain,spamListTrain)
-# val_dataset = TensorDataset(oneHotVal,spamListVal)
-# # test_dataset = TensorDataset(oneHotTest,spamListTest)
-# train_loader = DataLoader(dataset=train_dataset, batch_size=32, shuffle=True)
-# val_loader = DataLoader(dataset=val_dataset, batch_size=32)
-# my_
+model = nn.Sequential(
+    nn.Linear(300, 1)
+)
+torch.manual_seed(42)
+loss_fn = nn.BCEWithLogitsLoss()
+optimizer = optim.Adam(model.parameters(), lr = 0.01)
+my_model = StepByStep(model, loss_fn, optimizer)
+trainSentences = torch.as_tensor(trainSentences).float()
+trainingSpamList = torch.as_tensor(trainingSpamList).float()
+valSentences = torch.as_tensor(valSentences).float()
+valSpamList = torch.as_tensor(valSpamList).float()
+testSentences = torch.as_tensor(testSentences).float()
+print(trainSentences.shape)
+print(trainingSpamList.shape)
+print(valSentences.shape)
+print(valSpamList.shape)
+train_dataset = TensorDataset(trainSentences,trainingSpamList)
+val_dataset = TensorDataset(valSentences,valSpamList)
+# test_dataset = TensorDataset(oneHotTest,spamListTest)
+train_loader = DataLoader(dataset=train_dataset, batch_size=32, shuffle=True)
+val_loader = DataLoader(dataset=val_dataset, batch_size=32)
+print(model)
+my_model.set_loaders(train_loader, val_loader)
+my_model.train(100)
+fig = my_model.plot_losses()
+plt.show()
+my_model.model.eval()
+out = my_model.model(testSentences)
+print(out)
+prob_sigmoid = torch.sigmoid(out).squeeze().tolist()
+predictions = []
+for i in prob_sigmoid:
+    if i > 0.5:
+        predictions.append(1)
+    else:
+        predictions.append(0)
+correct = 0
+for i in range(len(predictions)):
+    if predictions[i] == testSpamList[i]:
+        correct+=1
+print('accuarcy', correct/len(predictions))
+
