@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 from neuralNetwork import StepByStep
 from simplifyDataset import loadSMS
 from collections import Counter
-
+from simplifyDataset import convertSpamToBinary
 
 
 #This code used https://datajenius.com/2022/03/13/a-deep-dive-into-nlp-tokenization-encoding-word-embeddings-sentence-embeddings-word2vec-bert/ as a resource, but different application
@@ -41,14 +41,6 @@ def oneHotEncode(dataset,mostCommonWords):
             if mostCommonWords[j] in row:
                 oneHot[i][j] = 1
     return oneHot
-
-def convertSpamToBinary(spamList):
-    for i in range(len(spamList)):
-        if spamList[i] == 'ham':
-            spamList[i] = 0
-        else:
-            spamList[i] = 1
-    return spamList
 trainingData,spamListTrain = loadSMS('SMSSpamcollection.csv')
 valData,spamListVal = loadSMS('SMSVal.csv')
 testData,spamListTest = loadSMS('SMSTest.csv')

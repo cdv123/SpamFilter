@@ -31,23 +31,6 @@ for row in range(length):
             if i !='':
                 hamCount+=1
                 hamWordsList.append(i)
-
-# with open("./Dataset/training-data.csv") as file:
-#     trainingDataCSV = list(csv.reader(file))
-#     length =len(trainingData)
-#     for row in range(len(trainingData)):
-#         rowWords = trainingData[row].split(" ")
-#         if trainingDataCSV[row][0] == "spam":
-#             for i in rowWords:
-#                 if i !='':
-#                     spamCount+=1
-#                     spamWordsList.append(i)
-#         else:
-#             for i in rowWords:
-#                 if i !='':
-#                     hamCount+=1
-#                     hamWordsList.append(i)
-
 allTrainingWords = hamWordsList+spamWordsList
 vocab = set(allTrainingWords)
 word_count = Counter(allTrainingWords)
@@ -65,9 +48,6 @@ print({k: v for k, v in sorted(wordProbHam.items(), key=lambda item: item[1])})
 incorrectCount = 0
 isSpam = True
 testData,spamTestList = loadSMS('SMSTest.csv')
-# for i in range(len(testData))
-# with open("./Dataset/test-data.csv") as file:
-#     testingDataCSV = list(csv.reader(file))
 for i in range(len(testData)):
     hamProb = 0.85
     spamProb = 0.15
@@ -88,5 +68,4 @@ for i in range(len(testData)):
     else:
         incorrectCount+=1
 accuracy = correctCount/(incorrectCount+correctCount)
-#random comment
 print(accuracy)

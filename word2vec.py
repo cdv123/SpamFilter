@@ -1,22 +1,15 @@
 import numpy as np
-from sklearn.linear_model import LinearRegression
 import torch
 import torch.optim as optim
 import torch.nn as nn
-from torch.utils.data import Dataset, TensorDataset, DataLoader
-from torch.utils.data.dataset import random_split
-from torch.utils.tensorboard import SummaryWriter
+from torch.utils.data import TensorDataset, DataLoader
 import matplotlib.pyplot as plt
 #stepbystep framework used (but simpler version used, from https://github.com/dvgodoy/PyTorchStepByStep/)
 from neuralNetwork import StepByStep
 from simplifyDataset import loadSMS
-from collections import Counter
-from nltk.tokenize import sent_tokenize, word_tokenize
-import gensim
-from gensim import corpora, downloader
+from simplifyDataset import convertSpamToBinary
+from gensim import downloader
 from gensim.parsing.preprocessing import *
-from gensim.utils import simple_preprocess
-from gensim.models import Word2Vec
 from gensim import downloader
 
 #This code used https://datajenius.com/2022/03/13/a-deep-dive-into-nlp-tokenization-encoding-word-embeddings-sentence-embeddings-word2vec-bert/ as a resource, but different application
@@ -57,14 +50,6 @@ def sentenceEmbedding(data,spamList):
         i+=1
     return sentenceEmbeddings
 
-def convertSpamToBinary(spamList):
-    for i in range(len(spamList)):
-        if spamList[i] == 'ham':
-            spamList[i] = 0
-        else:
-            spamList[i] = 1
-    return spamList
-
 trainSentences = sentenceEmbedding(trainingData,trainingSpamList)
 trainingSpamList = np.array(convertSpamToBinary(trainingSpamList))
 trainingSpamList = trainingSpamList.reshape(-1,1)
@@ -89,16 +74,10 @@ trainingSpamList = torch.as_tensor(trainingSpamList).float()
 valSentences = torch.as_tensor(valSentences).float()
 valSpamList = torch.as_tensor(valSpamList).float()
 testSentences = torch.as_tensor(testSentences).float()
-print(trainSentences.shape)
-print(trainingSpamList.shape)
-print(valSentences.shape)
-print(valSpamList.shape)
 train_dataset = TensorDataset(trainSentences,trainingSpamList)
 val_dataset = TensorDataset(valSentences,valSpamList)
-# test_dataset = TensorDataset(oneHotTest,spamListTest)
 train_loader = DataLoader(dataset=train_dataset, batch_size=32, shuffle=True)
 val_loader = DataLoader(dataset=val_dataset, batch_size=32)
-print(model)
 my_model.set_loaders(train_loader, val_loader)
 my_model.train(100)
 fig = my_model.plot_losses()

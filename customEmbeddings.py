@@ -17,6 +17,7 @@ from gensim import corpora, downloader
 from gensim.parsing.preprocessing import *
 from gensim.utils import simple_preprocess
 from gensim.models import Word2Vec
+from simplifyDataset import convertSpamToBinary
 
 trainingData,trainingSpamList = loadSMS('SMSSpamCollection.csv')
 
@@ -43,7 +44,6 @@ def sentenceEmbedding(data,spamList):
         row = data[i].split(" ")
         length = 0
         for j in row:
-
             try:
                 sentence = np.add(sentence,np.array(word2vec.wv[j]))
                 length+=1
@@ -61,13 +61,6 @@ def sentenceEmbedding(data,spamList):
         i+=1
     return sentenceEmbeddings
 
-def convertSpamToBinary(spamList):
-    for i in range(len(spamList)):
-        if spamList[i] == 'ham':
-            spamList[i] = 0
-        else:
-            spamList[i] = 1
-    return spamList
 
 trainSentences = sentenceEmbedding(trainingData,trainingSpamList)
 trainingSpamList = np.array(convertSpamToBinary(trainingSpamList))

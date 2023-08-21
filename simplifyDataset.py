@@ -130,3 +130,10 @@ def loadSMS2(link):
             else:
                 hamCount+=1
     return (testData,spamList)
+def convertSpamToBinary(spamList):
+    for i in range(len(spamList)):
+        if spamList[i] == 'ham':
+            spamList[i] = 0
+        else:
+            spamList[i] = 1
+    return spamList
