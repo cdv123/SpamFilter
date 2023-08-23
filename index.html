@@ -3,15 +3,33 @@
 <head>
     <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
     <link rel="stylesheet" href="style.css" />
-    <script defer src="https://pyscript.net/latest/pyscript.js"></script>
     <meta charset="UTF-8">
+    <script defer src="https://pyscript.net/latest/pyscript.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.6.0/dist/tf.min.js"></script>
     <title>Analysis of different methods for spam classification</title>
-    <py-script scr = "backgroundProccessing.py"></py-script>
+    <py-config type ="json">
+        {
+            "packages": ["numpy", "matplotlib"]
+        }
+    </py-config>
 </head>
 <body>
     <h1>Spam Detection</h1>
-    <label for="" id = "msg-label">Input spam (or ham) message here:</label>
+    <label for="msg-input" id = "msg-label">Input spam (or ham) message here:</label>
     <input type="text" id = "msg-input">
+    <button id = "Evaluate">Evaluate Message</button>
+    <div id = "modal-results">
+        <button class = "close-btn" id = "close-results">X</button>
+        <div class = "bar"> Naives Bayes confidence:</div>
+        <div class = "bar"> One Hot encoding confidence:</div>
+        <div class = "bar"> Word2Vec Google news embeddings confidence:</div>
+        <div class = "bar"> Word2Vec custom word embeddings confidence: </div>
+    </div> 
+    <button id = "settings-btn"> Settings</button>
+    <script src = "frontend.js"></script>
+    <py-script>
+        import numpy as np
+    </py-script>
 </body>
 </html>

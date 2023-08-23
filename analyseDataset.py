@@ -104,8 +104,3 @@ def useNetwork(my_model,testData,testSpamList,method_id,vector_size,mostCommonWo
             correct+=1
     print("accuarcy:", correct/len(predictions))
     return predictions
-trainingData,trainingSpamList = loadSMS("SMSSpamCollection.csv")
-valData,valSpamList = loadSMS("SMSVal.csv")
-testData,testSpamList = loadSMS("SMSTest.csv")
-my_model,word2vec = trainNetwork(2,trainingData,trainingSpamList,valData,valSpamList)
-useNetwork(my_model,testData,testSpamList,2,500,word2vec)

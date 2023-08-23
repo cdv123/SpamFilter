@@ -1,5 +1,5 @@
 html{
-    background-color: #CDD1DE;
+    background-color: #83BCA9;
 }
 h1{
     margin-top: 5%;
@@ -7,7 +7,7 @@ h1{
     font-size: 80px;
 }
 *{
-    color: #413620;
+    color: #282B28;
 }
 #msg-label{
     margin-top: 2%;
@@ -20,4 +20,40 @@ h1{
     margin-top: 2%;
     width: 36%;
     height: 20%;
+}
+#Evaluate{
+    margin-left:33.5%;
+    margin-right:30%;
+    margin-top: 2%;
+    height: 25%;
+    width: 30%;
+    padding: 1%;
+    font-size: 40px;
+    background-color: #087F8C;
+    border: none;
+}
+#modal-results{
+    display: none;
+    height: 50%;
+    width: 70%;
+    z-index: 50;
+    background-color: #D36135;
+    position: fixed;
+    left: 14%;
+    top: 25%;
+    opacity: 1;
+}
+.close-btn{
+    z-index: 10;
+}
+.bar{
+    margin-top: 5%;
+    margin-left: 3%;
+    border: solid;
+    width: fit-content;
+}
+#settings-btn{
+    position: fixed;
+    left: 95%;
+    top: 2%;
 }
