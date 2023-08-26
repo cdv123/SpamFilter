@@ -6,12 +6,12 @@
     <meta charset="UTF-8">
     <script defer src="https://pyscript.net/latest/pyscript.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.6.0/dist/tf.min.js"></script>
     <title>Analysis of different methods for spam classification</title>
-    <py-config type ="json">
-        {
-            "packages": ["numpy", "gensim"]
-        }
+    <py-config>
+        packages= ["numpy", "gensim","nltk"]
+        [[fetch]]
+        from = "./"
+        files =["numpyNetwork.py", "word2vec.py", "simplifyDataset.py", "numpyNetwork.py", "oneHot.py", "customEmbeddings.py"]
     </py-config>
 </head>
 <body>
@@ -31,6 +31,16 @@
     <py-script>
         import numpy as np
         import gensim
+        from gensim.models import Word2Vec
+        from js import document
+        from word2vec import sentenceEmbedding
+        from oneHot import oneHotEncode
+        from oneHot import getMostCommonWords
+        from customEmbeddings import sentenceEmbedding2
+        from customEmbeddings import tokenize
+        from numpyNetwork import neuralNetwork
+        from simplifyDataset import loadSMS
+        trainingData,spamData = loadSMS("SMSSpamCollection.txt")
     </py-script>
 </body>
 </html>

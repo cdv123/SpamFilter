@@ -5,6 +5,12 @@ from oneHot import oneHotEncode
 from oneHot import getMostCommonWords
 from simplifyDataset import loadSMS
 from simplifyDataset import convertSpamToBinary
+from gensim.models import Word2Vec
+from gensim import downloader
+from word2vec import sentenceEmbedding
+from customEmbeddings import tokenize
+from customEmbeddings import sentenceEmbedding2
+from simplifyDataset import loadSMS3
 def neuralNetwork(trainingData, spamData,lr):
     vectorSize = len(trainingData[0])
     #initialise weights
@@ -24,7 +30,6 @@ def neuralNetwork(trainingData, spamData,lr):
         for x in range(len(trainingData)):
             a = getOutput(trainingData[x],w,b)
             a = sigmoid(a)
-            loss = BCE(spamData[x],a,vectorSize)
             gradw,gradb = computeGradient(trainingData[x],spamData[x],a,vectorSize)
             w,b = updateWeights(w,b,gradw,gradb,lr)
     return w,b
@@ -75,15 +80,25 @@ def testNetwork(testData,spamTest,w,b):
             incorrect+=1
     accuarcy = correct/(correct+incorrect)
     return accuarcy
-trainingData, spamData = loadSMS('SMSSpamCollection.csv')
-spamData = convertSpamToBinary(spamData)
-vector_size = 300
-mostCommonWords = getMostCommonWords(trainingData,vector_size)
-oneHotTrain = list(oneHotEncode(trainingData,mostCommonWords).values())
-testData, spamTest = loadSMS('SMSTest.csv')
-oneHotTest = list(oneHotEncode(testData,mostCommonWords).values())
-spamTest = convertSpamToBinary(spamTest)
-weights,bias = neuralNetwork(oneHotTrain,spamData,0.9)
-# print(weights,bias)
-print(testNetwork(oneHotTest,spamTest,weights,bias))
+
+# def useNetwork(weights,bias,message):
+
+
+# trainingData, spamData = loadSMS('SMSSpamCollection.txt')
+# spamData = convertSpamToBinary(spamData)
+# vector_size = 300
+# wordEmbedding = tokenize(trainingData)
+# word2vec = Word2Vec(wordEmbedding,vector_size=vector_size,min_count=1,workers=4,window=5,sg=1)
+# trainSentences = sentenceEmbedding2(trainingData,spamData,word2vec,vector_size)
+# # mostCommonWords = getMostCommonWords(trainingData,vector_size)
+# # oneHotTrain = list(oneHotEncode(trainingData,mostCommonWords).values())
+# testData, spamTest = loadSMS('SMSTest.txt')
+# # oneHotTest = list(oneHotEncode(testData,mostCommonWords).values())
+# spamTest = convertSpamToBinary(spamTest)
+# testSentences = sentenceEmbedding2(testData,spamTest,word2vec,vector_size)
+# # weights,bias = neuralNetwork(oneHotTrain,spamData,0.9)
+# # print(weights,bias)
+# # print(testNetwork(oneHotTest,spamTest,weights,bias))
+# weights,bias = neuralNetwork(trainSentences,spamData,0.9)
+# print(testNetwork(testSentences,spamTest,weights,bias))
 

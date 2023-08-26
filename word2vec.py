@@ -1,16 +1,6 @@
 import numpy as np
-import torch
-import torch.optim as optim
-import torch.nn as nn
-from torch.utils.data import TensorDataset, DataLoader
-import matplotlib.pyplot as plt
 #stepbystep framework used (but simpler version used, from https://github.com/dvgodoy/PyTorchStepByStep/)
-from neuralNetwork import StepByStep
-from simplifyDataset import loadSMS
-from simplifyDataset import convertSpamToBinary
-from gensim import downloader
-from gensim.parsing.preprocessing import *
-from gensim import downloader
+
 
 #This code used https://datajenius.com/2022/03/13/a-deep-dive-into-nlp-tokenization-encoding-word-embeddings-sentence-embeddings-word2vec-bert/ as a resource, but different application
 

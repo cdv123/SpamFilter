@@ -1,23 +1,6 @@
 import numpy as np
-from sklearn.linear_model import LinearRegression
-import torch
-import torch.optim as optim
-import torch.nn as nn
-from torch.utils.data import Dataset, TensorDataset, DataLoader
-from torch.utils.data.dataset import random_split
-from torch.utils.tensorboard import SummaryWriter
-import matplotlib.pyplot as plt
 #stepbystep framework used (but simpler version used, from https://github.com/dvgodoy/PyTorchStepByStep/)
-from neuralNetwork import StepByStep
-from simplifyDataset import loadSMS
-from collections import Counter
-from nltk.tokenize import sent_tokenize, word_tokenize
-import gensim
-from gensim import corpora, downloader
-from gensim.parsing.preprocessing import *
-from gensim.utils import simple_preprocess
-from gensim.models import Word2Vec
-from simplifyDataset import convertSpamToBinary
+
 
 # trainingData,trainingSpamList = loadSMS('SMSSpamCollection.csv')
 def tokenize(trainingData):
