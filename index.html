@@ -11,7 +11,7 @@
         packages= ["numpy", "gensim"]
         [[fetch]]
         from = "./"
-        files =["numpyNetwork.py", "word2vec.py", "simplifyDataset.py", "numpyNetwork.py", "oneHot.py", "customEmbeddings.py","dataset.py"]
+        files =["numpyNetwork.py", "word2vec.py", "simplifyDataset.py", "numpyNetwork.py", "oneHot.py","dataset.py","naivesBayesMethod.py"]
     </py-config>
 </head>
 <body>
@@ -34,10 +34,14 @@
         from js import document
         from word2vec import sentenceEmbedding
         from oneHot import oneHotEncode,getMostCommonWords
-        from customEmbeddings import sentenceEmbedding2,tokenize
         from numpyNetwork import neuralNetwork
         from simplifyDataset import loadSMS,convertSpamToBinary
         from naivesBayesMethod import trainModel
+        from pyodide.http import open_url
+        trainingText = open_url("https://raw.githubusercontent.com/cdv123/SpamFilter/webversion/Dataset/SMSSpamCollection.txt")
+        stopwordsURL = open_url("https://raw.githubusercontent.com/cdv123/SpamFilter/webversion/Dataset/stopwords.txt")
+        f = trainingText.read()
+        print(type(f))
 
     </py-script>
 </body>
