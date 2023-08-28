@@ -174,3 +174,9 @@ class StepByStep(object):
             # Fetches a single mini-batch so we can use add_graph
             x_dummy, y_dummy = next(iter(self.train_loader))
             self.writer.add_graph(self.model, x_dummy.to(self.device))
+trainingData,spamData = loadSMS(data,stopwords)
+spamData = convertSpamToBinary(spamData)
+vector_size = 300
+mostCommonWords = getMostCommonWords(trainingData,vector_size)
+oneHotTrain = list(oneHotEncode(trainingData,mostCommonWords).values())
+weights,bias = neuralNetwork(oneHotTrain,spamData,0.9)

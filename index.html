@@ -8,10 +8,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Analysis of different methods for spam classification</title>
     <py-config>
-        packages= ["numpy", "gensim","nltk"]
+        packages= ["numpy", "gensim"]
         [[fetch]]
         from = "./"
-        files =["numpyNetwork.py", "word2vec.py", "simplifyDataset.py", "numpyNetwork.py", "oneHot.py", "customEmbeddings.py"]
+        files =["numpyNetwork.py", "word2vec.py", "simplifyDataset.py", "numpyNetwork.py", "oneHot.py", "customEmbeddings.py","dataset.py"]
     </py-config>
 </head>
 <body>
@@ -30,17 +30,15 @@
     <script src = "frontend.js"></script>
     <py-script>
         import numpy as np
-        import gensim
         from gensim.models import Word2Vec
         from js import document
         from word2vec import sentenceEmbedding
-        from oneHot import oneHotEncode
-        from oneHot import getMostCommonWords
-        from customEmbeddings import sentenceEmbedding2
-        from customEmbeddings import tokenize
+        from oneHot import oneHotEncode,getMostCommonWords
+        from customEmbeddings import sentenceEmbedding2,tokenize
         from numpyNetwork import neuralNetwork
-        from simplifyDataset import loadSMS
-        trainingData,spamData = loadSMS("SMSSpamCollection.txt")
+        from simplifyDataset import loadSMS,convertSpamToBinary
+
+
     </py-script>
 </body>
 </html>
