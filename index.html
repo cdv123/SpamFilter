@@ -40,8 +40,13 @@
         from pyodide.http import open_url
         trainingText = open_url("https://raw.githubusercontent.com/cdv123/SpamFilter/webversion/Dataset/SMSSpamCollection.txt")
         stopwordsURL = open_url("https://raw.githubusercontent.com/cdv123/SpamFilter/webversion/Dataset/stopwords.txt")
-        f = trainingText.read()
-        print(type(f))
+        gloveEmbedding = open_url("https://raw.githubusercontent.com/cdv123/SpamFilter/webversion/gloveEmbedding.txt")
+        customEmbedding = open_url("https://raw.githubusercontent.com/cdv123/SpamFilter/webversion/customEmbedding.txt")
+        trainingText = trainingText.read()
+        gloveEmbedding = gloveEmbedding.read()
+        customEmbedding = customEmbedding.read()
+        trainingData,spamData = loadSMS(trainingText)
+        spamData = convertSpamToBinary(spamData)
 
     </py-script>
 </body>
