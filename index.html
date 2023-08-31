@@ -4,11 +4,14 @@
     <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
     <link rel="stylesheet" href="style.css" />
     <meta charset="UTF-8">
+    <!-- pyscript library-->
     <script defer src="https://pyscript.net/latest/pyscript.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- d3 library-->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
     <title>Analysis of different methods for spam classification</title>
     <py-config>
-        packages= ["numpy", "gensim"]
+        packages= ["numpy"]
         [[fetch]]
         from = "./"
         files =["numpyNetwork.py", "word2vec.py", "simplifyDataset.py", "numpyNetwork.py", "oneHot.py","dataset.py","naivesBayesMethod.py"]
@@ -18,36 +21,58 @@
     <h1>Spam Detection</h1>
     <label for="msg-input" id = "msg-label">Input spam (or ham) message here:</label>
     <input type="text" id = "msg-input">
-    <button id = "Evaluate">Evaluate Message</button>
+    <button onclick="showX()" id = "Evaluate">Evaluate Message</button>
     <div id = "modal-results">
         <button class = "close-btn" id = "close-results">X</button>
         <div class = "bar"> Naives Bayes confidence:</div>
         <div class = "bar"> One Hot encoding confidence:</div>
         <div class = "bar"> Word2Vec Google news embeddings confidence:</div>
         <div class = "bar"> Word2Vec custom word embeddings confidence: </div>
+        <div id = "results-chart"></div>
     </div> 
     <button id = "settings-btn"> Settings</button>
-    <script src = "frontend.js"></script>
+
     <py-script>
         import numpy as np
-        from gensim.models import Word2Vec
-        from js import document
-        from word2vec import sentenceEmbedding
-        from oneHot import oneHotEncode,getMostCommonWords
-        from numpyNetwork import neuralNetwork
-        from simplifyDataset import loadSMS,convertSpamToBinary
-        from naivesBayesMethod import trainModel
+        from word2vec import sentenceEmbedding, useEmbedding
+        from oneHot import oneHotEncode,getMostCommonWords,oneHotEncode2
+        from numpyNetwork import neuralNetwork,getOutput, sigmoid
+        from simplifyDataset import loadSMS,convertSpamToBinary,loadMessage
+        from naivesBayesMethod import trainModel, analyseMsg
         from pyodide.http import open_url
         trainingText = open_url("https://raw.githubusercontent.com/cdv123/SpamFilter/webversion/Dataset/SMSSpamCollection.txt")
-        stopwordsURL = open_url("https://raw.githubusercontent.com/cdv123/SpamFilter/webversion/Dataset/stopwords.txt")
-        gloveEmbedding = open_url("https://raw.githubusercontent.com/cdv123/SpamFilter/webversion/gloveEmbedding.txt")
-        customEmbedding = open_url("https://raw.githubusercontent.com/cdv123/SpamFilter/webversion/customEmbedding.txt")
+        customEmbedding = open_url("https://raw.githubusercontent.com/cdv123/SpamFilter/webversion/Dataset/customEmbedding.txt")
         trainingText = trainingText.read()
-        gloveEmbedding = gloveEmbedding.read()
         customEmbedding = customEmbedding.read()
         trainingData,spamData = loadSMS(trainingText)
         spamData = convertSpamToBinary(spamData)
-
+        spamData2 = spamData[:]
+        vectorSize = 300
+        mostCommonWords = getMostCommonWords(trainingData,vectorSize)
+        oneHotData = oneHotEncode(trainingData,mostCommonWords)
+        def oneHotTrain(trainingData,spamData,vectorSize):
+            mostCommonWords = getMostCommonWords(trainingData,vectorSize)
+            oneHotData = list(oneHotEncode(trainingData,mostCommonWords).values())
+            weights,bias = neuralNetwork(oneHotData,spamData,0.9)
+            arrReturn = [weights,bias]
+            return arrReturn
+        def naivesBayesTrain(trainingData,spamData):
+            wordProbHam,wordProbSpam = trainModel(trainingData,spamData)
+            return wordProbHam,wordProbSpam
+        def word2vecTrain(trainingData,spamData):
+            embeddingDict = useEmbedding(customEmbedding)
+            trainSentences = sentenceEmbedding(trainingData,spamData,embeddingDict,100)
+            weights,bias = neuralNetwork(trainSentences,spamData,0.9)
+            arrReturn = [weights,bias]
+            return arrReturn
+        def useNetwork(weights,bias,message):
+            message = loadMessage(message)
+            oneHotData = oneHotEncode2(message,mostCommonWords)
+            return sigmoid(getOutput(oneHotData,weights,bias))
+        bayesArr = naivesBayesTrain(trainingData,spamData)
+        word2vecArr = word2vecTrain(trainingData,spamData2)
+        weights,bias = neuralNetwork(oneHotData,spamData,0.9)
     </py-script>
+    <script src = "script.js"></script>
 </body>
 </html>

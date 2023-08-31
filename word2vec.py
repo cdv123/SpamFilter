@@ -1,20 +1,19 @@
 import numpy as np
-def useEmbedding():
-    with open("customEmbedding.txt") as f:
-        lines = f.readlines()
-        embeddingDict = {}
-        i = 0
-        while i< len(lines):
-            word = lines[i][:-1]
+def useEmbedding(file):
+    datalines = file.split("\n")    
+    embeddingDict = {}
+    i = 0
+    while i< len(datalines):
+        word = datalines[i][:-1]
+        i+=1
+        stringNums = ""
+        while i<len(datalines) and datalines[i][0] == " ":
+            stringNums += datalines[i]
             i+=1
-            stringNums = ""
-            while i<len(lines) and lines[i][0] == " ":
-                stringNums += lines[i]
-                i+=1
-            stringArray = stringNums.split(' ')
-            modArray =[i for i in stringArray if i!='' and i!='\n']
-            vector = np.array([float(j) for j in modArray if j !=''])
-            embeddingDict[word] = vector
+        stringArray = stringNums.split(' ')
+        modArray =[i for i in stringArray if i!='' and i!='\n' and i !='\r']
+        vector = np.array([float(j) for j in modArray if j !=''])
+        embeddingDict[word] = vector
     return embeddingDict
 def useEmbedding2():
     with open("gloveEmbedding.txt", encoding="utf8") as f:

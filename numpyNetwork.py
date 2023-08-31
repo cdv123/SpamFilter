@@ -1,5 +1,7 @@
 import numpy as np
 import math
+from simplifyDataset import loadSMS2,convertSpamToBinary,loadMessage
+from oneHot import oneHotEncode,oneHotEncode2,getMostCommonWords
 import random
 def neuralNetwork(trainingData, spamData,lr):
     vectorSize = len(trainingData[0])
@@ -16,9 +18,13 @@ def neuralNetwork(trainingData, spamData,lr):
     #train step - 
     for epoch in range(11):
         for x in range(len(trainingData)):
+            # Compute prediction
             a = getOutput(trainingData[x],w,b)
+            # activation function - normalise value
             a = sigmoid(a)
+            # compute gradient loss (actual loss not needed)
             gradw,gradb = computeGradient(trainingData[x],spamData[x],a,vectorSize)
+            # update weights using gradient loss
             w,b = updateWeights(w,b,gradw,gradb,lr)
     return w,b
 
@@ -26,10 +32,12 @@ def sigmoid(x):
     return (1/(1+(math.exp(-x))))
 
 def BCE(y,logit,m):
+    # binary cross entroppy loss function
     loss = np.multiply(-y,np.log(logit))-np.multiply((1-y),np.log(1-logit))
     loss = np.sum(loss)*1/m
     return loss
 def getOutput(x,w,b):
+    # prediction computed by scalar product of input vector and weights plus bias
     return (np.matmul(x,w)+b)
 
 def computeGradient(x,y,a,vectorSize):
@@ -58,6 +66,8 @@ def testNetwork(testData,spamTest,w,b):
     predictions = []
     for i in range(len(outputs)):
         if sigmoid(outputs[i])>0.5:
+            if i == 11:
+                print(testData[i],spamTest[i])
             predictions.append(1)
         else:
             predictions.append(0)
@@ -69,17 +79,21 @@ def testNetwork(testData,spamTest,w,b):
     accuarcy = correct/(correct+incorrect)
     return accuarcy
 
-# def useNetwork(weights,bias,message):
-# trainingData,spamData = loadSMS(data,stopwords)
 # trainingData,spamData = loadSMS2('SMSSpamCollection.txt')
-# print(spamData)
 # spamData = convertSpamToBinary(spamData)
-# print(spamData)
 # vector_size = 300
 # mostCommonWords = getMostCommonWords(trainingData,vector_size)
 # oneHotTrain = list(oneHotEncode(trainingData,mostCommonWords).values())
 # weights,bias = neuralNetwork(oneHotTrain,spamData,0.9)
-
+# print(bias)
+# testData, spamTest = loadSMS2('SMSTest.txt')
+# oneHotTest = list(oneHotEncode(testData,mostCommonWords).values())
+# spamTest = convertSpamToBinary(spamTest)
+# print(testNetwork(oneHotTest,spamTest,weights,bias))
+# message = "Had your contract mobile 11 Mnths? Latest Motorola, Nokia etc. all FREE! Double Mins & Text on Orange tariffs. TEXT YES for callback, no to remove from records"
+# message = loadMessage(message)
+# oneHotData = oneHotEncode2(message,mostCommonWords)
+# print(sigmoid(getOutput(oneHotData,weights,bias)))
 # trainingData, spamData = loadSMS('SMSSpamCollection.txt')
 # spamData = convertSpamToBinary(spamData)
 # vector_size = 300
@@ -88,14 +102,10 @@ def testNetwork(testData,spamTest,w,b):
 # trainSentences = sentenceEmbedding2(trainingData,spamData,word2vec,vector_size)
 # # mostCommonWords = getMostCommonWords(trainingData,vector_size)
 # # oneHotTrain = list(oneHotEncode(trainingData,mostCommonWords).values())
-# testData, spamTest = loadSMS2('SMSTest.txt')
 # print(testData)
-# oneHotTest = list(oneHotEncode(testData,mostCommonWords).values())
-# spamTest = convertSpamToBinary(spamTest)
 # testSentences = sentenceEmbedding2(testData,spamTest,word2vec,vector_size)
 # # weights,bias = neuralNetwork(oneHotTrain,spamData,0.9)
 # # print(weights,bias)
-# print(testNetwork(oneHotTest,spamTest,weights,bias))
 # weights,bias = neuralNetwork(trainSentences,spamData,0.9)
 # print(testNetwork(testSentences,spamTest,weights,bias))
 
