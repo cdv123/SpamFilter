@@ -80,10 +80,10 @@ punc = '''!()-[]{};:'"\,<>./?@#$%^&*_~0123456789'''
 def loadMessage(message):
     message = message.lower()
     new_message =[]
-    message_tokens = message.split()
+    message_tokens = message.split(' ')
     for token in message_tokens:
         if token not in stop_words:
-            new_message.append(message)
+            new_message.append(token)
     new_message = ' '.join(new_message)
     for char in new_message:
         if char in punc:

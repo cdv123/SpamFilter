@@ -29,7 +29,7 @@ def neuralNetwork(trainingData, spamData,lr):
     return w,b
 
 def sigmoid(x):
-    return (1/(1+(math.exp(-x))))
+    return (1/(1+(np.exp(-x))))
 
 def BCE(y,logit,m):
     # binary cross entroppy loss function
@@ -38,7 +38,7 @@ def BCE(y,logit,m):
     return loss
 def getOutput(x,w,b):
     # prediction computed by scalar product of input vector and weights plus bias
-    return (np.matmul(x,w)+b)
+    return (np.dot(x,w)+b)
 
 def computeGradient(x,y,a,vectorSize):
     gradx = (1/vectorSize)*np.dot(a-y,x)
@@ -78,6 +78,32 @@ def testNetwork(testData,spamTest,w,b):
             incorrect+=1
     accuarcy = correct/(correct+incorrect)
     return accuarcy
+
+# input layer (1,vectorsize)
+# hidden layer (1,x)
+# output layer - probability
+
+def twoLayerNetwork(trainingData, spamData, lr,hiddenNodesNum):
+    vectorSize = len(trainingData[0])
+    hiddenW = np.random.rand(vectorSize,hiddenNodesNum)*lr
+    hiddenBias = np.random.rand(vectorSize)*lr
+    outputW = np.random.rand(vectorSize)*lr
+    outputBias = random.random()*lr
+    for epoch in range(11):
+        for x in range(len(trainingData)):
+            hiddenRes,finalRes = forward_pass(x,hiddenW,hiddenBias,outputW,outputBias)
+            finalRes = sigmoid(finalRes)
+            error = BCE()
+
+def forward_pass(x,hiddenW,hiddenBias,outputW,outputBias):
+    hiddenOut = np.matmul(x,hiddenW)+hiddenBias
+    hiddenOut = ReLu(hiddenOut)
+    finalOut = np.dot(hiddenOut,outputW)+outputBias
+    return hiddenOut,finalOut
+
+def ReLu(x):
+    return np.maximum(0,x)
+
 
 # trainingData,spamData = loadSMS2('SMSSpamCollection.txt')
 # spamData = convertSpamToBinary(spamData)

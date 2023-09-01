@@ -40,7 +40,6 @@ def sentenceEmbedding(data,spamList,word2vec,vector_size):
                 length+=1
             except:
                 pass
-        
         if length ==0:
             data.pop(i)
             spamList.pop(i)
@@ -52,6 +51,23 @@ def sentenceEmbedding(data,spamList,word2vec,vector_size):
             sentenceEmbeddings.append(sentence)
         i+=1
     return sentenceEmbeddings
+def messageEmbedding(message,word2vec,vector_size):
+    message_words = message.split(" ")
+    sentence = np.zeros(vector_size)
+    length = 0
+    for word in message_words:
+        try:
+            sentence = np.add(sentence,np.array(word2vec[word]))
+            length+=1
+        except:
+            pass
+    if length == 0:
+        return None
+    for dim in sentence:
+        dim = dim/length
+    return sentence
+        
+
 def tokenize(trainingData):
     wordEmbedding = []
     for i in range(len(trainingData)):
