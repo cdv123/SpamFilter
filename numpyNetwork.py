@@ -3,18 +3,16 @@ import math
 from simplifyDataset import loadSMS2,convertSpamToBinary,loadMessage
 from oneHot import oneHotEncode,oneHotEncode2,getMostCommonWords
 import random
+from word2vec import useEmbedding2,sentenceEmbedding
 def neuralNetwork(trainingData, spamData,lr):
     vectorSize = len(trainingData[0])
     #initialise weights
-    w = np.random.rand(vectorSize)*lr
+    w = np.random.rand(vectorSize)
     #initialise m and v for adam optimizer
     m = np.zeros(vectorSize)
     v = np.zeros(vectorSize)
     #initialise bias
     b = random.random()
-
-    # shuffle the lists with same order
-    np.random.shuffle(trainingData)
     #train step - 
     for epoch in range(10):
         for x in range(len(trainingData)):
@@ -88,16 +86,20 @@ def testNetwork(testData,spamTest,w,b):
 
 def twoLayerNetwork(trainingData,spamData,lr,hiddenNodesNum):
     vectorSize = len(trainingData[0])
+    np.random.seed(0)
+    limit= math.sqrt(6/(vectorSize+hiddenNodesNum))
     # weight matrix to go from input layer to hidden layer
-    hiddenW = np.random.rand(vectorSize,hiddenNodesNum)
+    hiddenW = np.random.uniform(-limit,limit,size=(vectorSize,hiddenNodesNum))
+    # hiddenW = np.zeros((vectorSize,hiddenNodesNum))
     # bias vector to go from input layer to hidden layer
-    hiddenBias = np.random.rand(hiddenNodesNum)
+    hiddenBias = np.zeros(hiddenNodesNum)
+    limit=math.sqrt(6/(1+hiddenNodesNum))
     # weight vector to go from hidden layer to output layer
-    outputW = np.random.rand(hiddenNodesNum)
+    outputW = np.random.uniform(-limit,limit,size=hiddenNodesNum)
+    # outputW =np.zeros(hiddenNodesNum)
     # bias scalar to go from hidden layer to output layer
-    outputBias = random.random()
-    np.random.shuffle(trainingData)
-    for epoch in range(10):
+    outputBias = 0
+    for epoch in range(20):
         for x in range(len(trainingData)):
             # compute result of hidden layer and final output
             hiddenRes,finalRes = forward_pass(trainingData[x],hiddenW,hiddenBias,outputW,outputBias)
@@ -116,12 +118,12 @@ def twoLayerNetwork(trainingData,spamData,lr,hiddenNodesNum):
             gradHiddenW,gradHiddenBias = computeHiddenGradient(errorHidden,trainingData[x])
             # update parameters to go grom input layer to output layer
             hiddenW, hiddenBias = updateWeights(hiddenW,hiddenBias,gradHiddenW,gradHiddenBias,lr)
-            # print(error)
+
     return hiddenW,hiddenBias,outputW,outputBias
 
 def computeHiddenGradient(errorHidden,vectorInput):
     gradHiddenW = np.dot(vectorInput,errorHidden)
-    gradHiddenBias = np.sum(errorHidden)
+    gradHiddenBias = np.sum(errorHidden,axis=0)
     return gradHiddenW,gradHiddenBias
 
 def ReLu(x):
@@ -146,6 +148,10 @@ def findResult(x,hiddenW,hiddenBias,outputW,outputBias):
     finalOut = sigmoid(finalOut)
     return finalOut
 
+# def initializeWeights(vectorSize,hiddenNodesNum):
+#     W = np.random.rand((x_dim,y_dim))*np.sqrt(1/(vectorSize+hiddenNodesNum))
+#     outputW = np.random.uniform(-limit,limit,size=hiddenNodesNum)
+
 def testTwoLayer(testData,spamData,hiddenW,hiddenBias,outputW,outputBias):
     correctCount = 0
     for i in range(len(testData)):
@@ -157,28 +163,22 @@ def testTwoLayer(testData,spamData,hiddenW,hiddenBias,outputW,outputBias):
         if prediction == spamData[i]:
             correctCount+=1
     return correctCount/len(testData)
-# newLines = ""
-# with open('Dataset/SMSTest copy.txt') as file:
-#     lines = file.readlines()
-#     for i in lines:
-#         if i[1] == "s":
-#             newLines+= i
-# print(len(newLines))
-# with open('Dataset/SMSTest copy.txt','w') as file:
-#     file.write(newLines)
-trainingData,spamData = loadSMS2('SMSSpamCollection.txt')
+trainingData,spamData = loadSMS2('SMSSpamCollection copy.txt')
 spamData = convertSpamToBinary(spamData)
 vector_size = 300
-mostCommonWords = getMostCommonWords(trainingData,vector_size)
-oneHotTrain = list(oneHotEncode(trainingData,mostCommonWords).values())
-# weights,bias,hiddenW,hiddenBias = twoLayerNetwork(oneHotTrain,spamData,0.04,2)
-weights,bias = neuralNetwork(oneHotTrain,spamData,0.001)
+embeddingDict = useEmbedding2()
+trainSentences = sentenceEmbedding(trainingData,spamData,embeddingDict,100)
+# mostCommonWords = getMostCommonWords(trainingData,vector_size)
+# oneHotTrain = list(oneHotEncode(trainingData,mostCommonWords).values())
+weights,bias,hiddenW,hiddenBias = twoLayerNetwork(trainSentences,spamData,0.004,9)
+# weights,bias = neuralNetwork(trainSentences,spamData,0.003)
 # print(bias)
 testData, spamTest = loadSMS2('SMSTest.txt')
-oneHotTest = list(oneHotEncode(testData,mostCommonWords).values())
+# oneHotTest = list(oneHotEncode(testData,mostCommonWords).values())
 spamTest = convertSpamToBinary(spamTest)
-# print(testTwoLayer(oneHotTest,spamTest,weights,bias,hiddenW,hiddenBias))
-print(testNetwork(oneHotTest,spamTest,weights,bias))
+testSentences = sentenceEmbedding(testData,spamTest,embeddingDict,100)
+print(testTwoLayer(testSentences,spamTest,weights,bias,hiddenW,hiddenBias))
+# print(testNetwork(testSentences,spamTest,weights,bias))
 # message = "Had your contract mobile 11 Mnths? Latest Motorola, Nokia etc. all FREE! Double Mins & Text on Orange tariffs. TEXT YES for callback, no to remove from records"
 # message = loadMessage(message)
 # oneHotData = oneHotEncode2(message,mostCommonWords)
