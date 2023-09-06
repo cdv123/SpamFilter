@@ -139,6 +139,7 @@ def forward_pass(x,hiddenW,hiddenBias,outputW,outputBias):
     hiddenOut+= hiddenBias
     hiddenOut = sigmoid(hiddenOut)
     finalOut = np.dot(hiddenOut,outputW)+outputBias
+    print(finalOut)
     return hiddenOut,finalOut
 
 def findResult(x,hiddenW,hiddenBias,outputW,outputBias):
