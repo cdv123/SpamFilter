@@ -2,13 +2,62 @@ const msgLabel = document.getElementById("msg-label")
 const evalBtn = document.getElementById("Evaluate")
 const modalResults = document.getElementById("modal-results")
 const messageInput = document.getElementById("msg-input")
+const settingsBtn = document.getElementById("settings-btn")
+const config = document.getElementById("config")
+const closeConfig = document.getElementById("close-config")
+const closeResults = document.getElementById("close-results")
+const checkBoxOneHot = document.getElementById("checkbox-one-hot")
+const checkBoxWord2Vec = document.getElementById("checkbox-word2vec")
+const hiddenOneHot = document.querySelectorAll(".hidden-one-hot")
+const hiddenWord2Vec = document.querySelectorAll(".hidden-word2vec")
+const naiveBayesBtn = document.getElementById("btn-naive-bayes")
+const oneHotBtn = document.getElementById("btn-one-hot")
+const word2vecBtn = document.getElementById("btn-word2vec")
+naiveBayesBtn.addEventListener("click", () => {
+
+})
+oneHotBtn.addEventListener("click", () => {
+    
+})
+word2vecBtn.addEventListener("click", () => {
+    
+})
 evalBtn.addEventListener("click", () => {
     modalResults.style.display = "block"
 })
-let closeResults = document.getElementById("close-results")
+settingsBtn.addEventListener("click", () =>{
+    config.style.display = "inline"
+})
 closeResults.addEventListener("click", () => {
     modalResults.style.display = "none"
     deleteChart()
+})
+closeConfig.addEventListener("click", () => {
+    config.style.display = "none"
+})
+checkBoxOneHot.addEventListener("click", () => {
+    if (checkBoxOneHot.checked){
+        for (let i = 0; i<hiddenOneHot.length; i++){
+            hiddenOneHot[i].style.display = "inline"
+        }
+    }
+    else{
+        for (let i = 0; i<hiddenWord2Vec.length; i++){
+            hiddenOneHot[i].style.display = "none"
+        }
+    }
+})
+checkBoxWord2Vec.addEventListener("click", () => {
+    if (checkBoxWord2Vec.checked){
+        for (let i = 0; i<hiddenWord2Vec.length; i++){
+            hiddenWord2Vec[i].style.display = "inline"
+        }
+    }
+    else{
+        for (let i = 0; i<hiddenWord2Vec.length; i++){
+            hiddenWord2Vec[i].style.display = "none"
+        }
+    }
 })
 function trainModels(){
     trainingData = pyscript.interpreter.globals.get('trainingData')
@@ -87,4 +136,7 @@ function createChart(modelResults){
     } 
 function deleteChart(){
     d3.select('svg').remove();
+}
+function showConfig(){
+
 }

@@ -11,10 +11,10 @@
     <script src="https://d3js.org/d3.v6.min.js"></script>
     <title>Analysis of different methods for spam classification</title>
     <py-config>
-        packages= ["numpy"]
+        packages= ["numpy","matplotlib"]
         [[fetch]]
         from = "./"
-        files =["numpyNetwork.py", "word2vec.py", "simplifyDataset.py", "numpyNetwork.py", "oneHot.py","dataset.py","naivesBayesMethod.py"]
+        files =["numpyNetwork.py", "word2vec.py", "simplifyDataset.py", "numpyNetwork.py", "oneHot.py","dataset.py","naiveBayesMethod.py"]
     </py-config>
 </head>
 <body>
@@ -28,14 +28,47 @@
         <div id = "results-chart"></div>
     </div> 
     <button id = "settings-btn"> Settings</button>
-
+    <div id = "config">
+        <button class = "close-btn" id = "close-config">X</button>
+        <p class = "line">
+            <p class = "model">Naive Bayes Model:</p>
+            <p class = "epoch-num">Number of epochs:</p>
+            <input class ="number-input" type="number" name="" value="20">
+            <p class = "setting">Words Used</p>
+            <input class ="number-input" type="number" name="" value="1000">
+            <button id = "btn-naive-bayes" class = "confirm-settings">Confirm and Retrain Naive Bayes</button>
+        </p>
+        <p class = "line">
+            <p class = "model">One-Hot Model:</p>
+            <p class = "epoch-num">Number of epochs:</p>
+            <input class ="number-input" type="number" name="" value="20">
+            <p class = "setting">Learning Rate:</p>
+            <input class = "number-input" type="number" name="" value="0.03">
+            <p class = "add-hidden">Add hidden layer</p>
+            <input id = "checkbox-one-hot" class = "hidden-layer" type="checkbox" name="" value="">
+            <p class = "hidden-nodes-num hidden-one-hot">Number of nodes in hidden layer:</p>
+            <input class = "hidden-nodes hidden-one-hot" type="" name="" value="9">
+            <button id = "btn-one-hot" class = "confirm-settings">Confirm and Retrain One-Hot</button>
+        </p>
+        <p class = "line">
+            <p class = "model">Word2Vec Model:</p>
+            <p class = "epoch-num">Number of epochs:</p>
+            <input class = "number-input" type="number" name="" value="20">
+            <p class = "add-hidden">Add hidden layer</p>
+            <input id = "checkbox-word2vec" class = "hidden-layer" type="checkbox" name="" value="">
+            <p class = "hidden-nodes-num hidden-word2vec">Number of nodes in hidden layer:</p>
+            <input class = "hidden-nodes hidden-word2vec" type="" name="" value="9">
+            <button id = "btn-word2vec" class = "confirm-settings">Confirm and Retrain Word2Vec</button>
+        </p>
+ 
+    </div>
     <py-script>
         import numpy as np
         from word2vec import sentenceEmbedding, useEmbedding, messageEmbedding
         from oneHot import oneHotEncode,getMostCommonWords,oneHotEncode2
         from numpyNetwork import neuralNetwork,getOutput, sigmoid
         from simplifyDataset import loadSMS,convertSpamToBinary,loadMessage
-        from naivesBayesMethod import trainModel, analyseMsg
+        from naiveBayesMethod import trainModel, analyseMsg
         from pyodide.http import open_url
         trainingText = open_url("https://raw.githubusercontent.com/cdv123/SpamFilter/webversion/Dataset/SMSSpamCollection.txt")
         customEmbedding = open_url("https://raw.githubusercontent.com/cdv123/SpamFilter/webversion/Dataset/customEmbedding.txt")
@@ -51,7 +84,7 @@
         def oneHotTrain(trainingData,spamData,vectorSize):
             mostCommonWords = getMostCommonWords(trainingData,vectorSize)
             oneHotData = list(oneHotEncode(trainingData,mostCommonWords).values())
-            weights,bias = neuralNetwork(oneHotData,spamData,0.9)
+            weights,bias = neuralNetwork(oneHotData,spamData,0.003)
             arrReturn = [weights,bias]
             return arrReturn
         def naivesBayesTrain(trainingData,spamData):
@@ -59,7 +92,7 @@
             return wordProbHam,wordProbSpam
         def word2vecTrain(trainingData,spamData):
             trainSentences = sentenceEmbedding(trainingData,spamData,embeddingDict,100)
-            weights,bias = neuralNetwork(trainSentences,spamData,0.9)
+            weights,bias = neuralNetwork(trainSentences,spamData,0.003)
             arrReturn = [weights,bias]
             return arrReturn
         def useOneHot(weights,bias,message):
@@ -76,7 +109,7 @@
         word2vecArr = word2vecTrain(trainingData,spamData2)
         word2vecWeight = word2vecArr[0]
         word2vecBias = word2vecArr[1]
-        weights,bias = neuralNetwork(oneHotData,spamData,0.9)
+        weights,bias = neuralNetwork(oneHotData,spamData,0.003)
     </py-script>
     <script src = "script.js"></script>
 </body>

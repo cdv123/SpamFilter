@@ -32,12 +32,32 @@ h1{
     background-color: #087F8C;
     border: none;
 }
+.confirm-settings{
+    background-color: #087F8C;
+    border: solid;
+    color: black;
+    position: fixed;
+    width: 10%;
+    height: 8%;
+    margin-left: 2%;
+}
 #modal-results{
     display: none;
     height: 50%;
     width: 70%;
     z-index: 50;
-    background-color: #D36135;
+    background-color: grey;
+    position: fixed;
+    left: 14%;
+    top: 25%;
+    opacity: 1;
+}
+#config{
+    display: none;
+    height: 60%;
+    width: 70%;
+    z-index: 50;
+    background-color: grey;
     position: fixed;
     left: 14%;
     top: 25%;
@@ -45,6 +65,9 @@ h1{
 }
 .close-btn{
     z-index: 10;
+    position: fixed;
+    left: 83%;
+    top: 24%;
 }
 .bar{
     margin-top: 5%;
@@ -56,4 +79,55 @@ h1{
     position: fixed;
     left: 95%;
     top: 2%;
+}
+.line{
+    margin-top: 5%;
+    margin-left: 3%;
+    display: block;
+}
+.model{
+    margin-left: 5%;
+    width: max-content;
+    display:inline-flex;
+    font-size: 20px;
+}
+.epoch-num{
+    margin-left: 3%;
+    height: 5%;
+    display: inline;
+    margin-top: 0%;
+}
+.number-input{
+    width: 4%;
+    display: inline;
+}
+.add-hidden{
+    margin-left: 3%;
+    height: 5%;
+    display: inline;
+    margin-top: 0%;
+}
+.setting{
+    margin-left: 3%;
+    height: 5%;
+    display: inline;
+    margin-top: 0%;
+}
+.hidden-nodes{
+    width: 4%;
+    display: none;
+}
+.hidden-nodes-num{
+    width: 4%;
+    display: none;
+    margin-left: 3%;
+}
+#btn-naive-bayes{
+    position: block;
+}
+#btn-one-hot{
+    position: block;
+}
+#btn-word2vec{
+    position: block;
 }
