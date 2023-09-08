@@ -1,6 +1,6 @@
 from collections import Counter
 from simplifyDataset import loadMessage
-def trainModel(trainingData,spamList):    
+def trainModel(trainingData,spamList,wordNum):    
     mostCommonWords = []
     allTrainingWords = []
     spamWordsList = []
@@ -23,7 +23,7 @@ def trainModel(trainingData,spamList):
     allTrainingWords = hamWordsList+spamWordsList
     vocab = set(allTrainingWords)
     word_count = Counter(allTrainingWords)
-    word_count = word_count.most_common(1000)
+    word_count = word_count.most_common(wordNum)
     mostCommonWords = []
     for i in range(0,len(word_count)):
         mostCommonWords.append(word_count[i][0])
@@ -34,7 +34,7 @@ def trainModel(trainingData,spamList):
         wordProbHam[i] = (hamWordsList.count(i))/(hamCount+len(vocab))
     return wordProbHam,wordProbSpam
 def useModel(testData,spamTestList,wordProbHam,wordProbSpam):
-    correctCount =0
+    correctCount = 0
     incorrectCount = 0
     isSpam = True
     for i in range(len(testData)):
@@ -61,8 +61,8 @@ def useModel(testData,spamTestList,wordProbHam,wordProbSpam):
 def analyseMsg(wordProbHam,wordProbSpam,message):
     message = loadMessage(message)
     message_words = message.split(' ')
-    hamProb = 0.85
-    spamProb = 0.15
+    hamProb = 0.5
+    spamProb = 0.5
     for i in range(len(message_words)):
         if message_words[i]!= ' ':
             if wordProbHam.get(message_words[i]) == None or wordProbHam.get(message_words[i]) == 0:  

@@ -13,20 +13,37 @@ const hiddenWord2Vec = document.querySelectorAll(".hidden-word2vec")
 const naiveBayesBtn = document.getElementById("btn-naive-bayes")
 const oneHotBtn = document.getElementById("btn-one-hot")
 const word2vecBtn = document.getElementById("btn-word2vec")
-naiveBayesBtn.addEventListener("click", () => {
+const settingInput = document.querySelectorAll("input")
+function createObject(object, variableName){
+    //Bind a variable whose name is the string variableName
+    // to the object called 'object'
+    let execString = variableName + " = object"
+    eval(execString)
+}
 
+naiveBayesBtn.addEventListener("click", () => {
+    var trainingData = pyscript.interpreter.globals.get('trainingData')
+    var spamData = pyscript.interpreter.globals.get('spamData')
+    let naiveBayesTrain = pyscript.interpreter.globals.get('naiveBayesTrain')
+    console.log("hello")
+    naiveBayesTrain(trainingData,spamData,parseInt(settingInput[2].value))
+    for (const result of naiveResults){
+        console.log(result["call"])
+    }
 })
 oneHotBtn.addEventListener("click", () => {
-    
 })
 word2vecBtn.addEventListener("click", () => {
-    
 })
 evalBtn.addEventListener("click", () => {
     modalResults.style.display = "block"
 })
 settingsBtn.addEventListener("click", () =>{
     config.style.display = "inline"
+    for (const animal of animals_from_py){
+        console.log(animal)
+    }
+
 })
 closeResults.addEventListener("click", () => {
     modalResults.style.display = "none"
@@ -64,7 +81,7 @@ function trainModels(){
     spamData = pyscript.interpreter.globals.get('spamData')
     oneHotTrain = pyscript.interpreter.globals.get('oneHotTrain')
     oneHotRes = oneHotTrain(trainingData,spamData,300)
-    naivesBayesTrain = pyscript.interpreter.globals.get('naivesBayesTrain')
+    naiveBayesTrain = pyscript.interpreter.globals.get('naiveBayesTrain')
     wordProb = naivesBayesTrain(trainingData,spamData)
     let probHam = wordProb[0]
     let probSpam = wordProb[1]
@@ -80,11 +97,11 @@ function showX(){
     let word2vecWeights = pyscript.interpreter.globals.get('word2vecWeight')
     let word2vecBias = pyscript.interpreter.globals.get('word2vecBias')
     let wordProbSpam = pyscript.interpreter.globals.get('wordProbSpam')
-    naivesBayesFun = pyscript.interpreter.globals.get('analyseMsg')
+    naiveBayesFun = pyscript.interpreter.globals.get('analyseMsg')
     message = loadMessage(message)
     oneHotFun = pyscript.interpreter.globals.get('useOneHot')
     word2vecFun =pyscript.interpreter.globals.get('useWord2Vec')
-    modelResults = [naivesBayesFun(wordProbHam,wordProbSpam,message),oneHotFun(oneHotWeights,oneHotBias,message),word2vecFun(word2vecWeights,word2vecBias,message)]
+    modelResults = [naiveBayesFun(wordProbHam,wordProbSpam,message),oneHotFun(oneHotWeights,oneHotBias,message),word2vecFun(word2vecWeights,word2vecBias,message)]
     createChart(modelResults)
 }
 function createChart(modelResults){
