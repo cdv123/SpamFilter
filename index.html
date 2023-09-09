@@ -14,7 +14,7 @@
         packages= ["numpy","matplotlib"]
         [[fetch]]
         from = "./"
-        files =["numpyNetwork.py", "word2vec.py", "simplifyDataset.py", "numpyNetwork.py", "oneHot.py","dataset.py","naiveBayesMethod.py"]
+        files =["numpyNetwork.py", "word2vec.py", "simplifyDataset.py", "numpyNetwork.py", "oneHot.py","naiveBayesMethod.py"]
     </py-config>
 </head>
 <body>
@@ -40,6 +40,8 @@
         </p>
         <p class = "line">
             <p class = "model">One-Hot Model:</p>
+            <p class = "epoch-num">Vector Size:</p>
+            <input class ="number-input" type="number" name="" value="300">
             <p class = "epoch-num">Number of epochs:</p>
             <input class ="number-input" type="number" name="" value="20">
             <p class = "setting">Learning Rate:</p>
@@ -72,6 +74,7 @@
         from simplifyDataset import loadSMS,convertSpamToBinary,loadMessage
         from naiveBayesMethod import trainModel, analyseMsg
         from pyodide.http import open_url
+        from pyodide.http import to_js
         import js
         from pyodide.ffi import create_proxy
         trainingText = open_url("https://raw.githubusercontent.com/cdv123/SpamFilter/webversion/Dataset/SMSSpamCollection.txt")
@@ -81,26 +84,31 @@
         trainingData,spamData = loadSMS(trainingText)
         spamData = convertSpamToBinary(spamData)
         spamData2 = spamData[:]
-        vectorSize = 300
-        mostCommonWords = getMostCommonWords(trainingData,vectorSize)
-        oneHotData = oneHotEncode(trainingData,mostCommonWords)
+        global oneHotWeights,oneHotBias
+        global word2vecWeights,word2vecBias
+        global wordProbHam,wordProbSpam
         embeddingDict = useEmbedding(customEmbedding)
-        animals = ['dog', 'cat', 'bird']
-        def oneHotTrain(trainingData,spamData,vectorSize,lr):
+        def oneHotTrain(trainingData,spamData,vectorSize,epochs,lr):
             mostCommonWords = getMostCommonWords(trainingData,vectorSize)
             oneHotData = list(oneHotEncode(trainingData,mostCommonWords).values())
-            weights,bias = neuralNetwork(oneHotData,spamData,lr)
-            arrReturn = [weights,bias]
-            return arrReturn
+            resultArr = neuralNetwork(oneHotData,spamData,lr,epochs)
+            global oneHotWeights
+            oneHotWeights = resultArr[0]
+            global oneHotBias
+            oneHotBias = resultArr[1]
         def naiveBayesTrain(trainingData,spamData,wordNum):
-            wordProbHam2,wordProbSpam2 = trainModel(trainingData,spamData,wordNum)
-            js.createObject(create_proxy([wordProbHam2,wordProbSpam2]),"naiveResults")
-            return wordProbHam2,wordProbSpam2
-        def word2vecTrain(trainingData,spamData,lr):
+            resultArr = trainModel(trainingData,spamData,wordNum)
+            global wordProbHam 
+            wordProbHam= resultArr[0]
+            global wordProbSpam
+            wordProbSpam = resultArr[1]
+        def word2vecTrain(trainingData,spamData,epochs,lr):
             trainSentences = sentenceEmbedding(trainingData,spamData,embeddingDict,100)
-            weights,bias = neuralNetwork(trainSentences,spamData,lr)
-            arrReturn = [weights,bias]
-            return arrReturn
+            resultArr = neuralNetwork(trainSentences,spamData,lr,epochs)
+            global word2vecWeights
+            word2vecWeights = resultArr[0]
+            global word2vecBias
+            word2vecBias = resultArr[1]
         def useOneHot(weights,bias,message):
             message = loadMessage(message)
             oneHotData = oneHotEncode2(message,mostCommonWords)
@@ -109,14 +117,9 @@
             message = loadMessage(message)
             wordVector = messageEmbedding(message,embeddingDict,100)
             return sigmoid(getOutput(wordVector,weights,bias))
-        bayesArr = naiveBayesTrain(trainingData,spamData,1000)
-        wordProbHam= bayesArr[0]
-        wordProbSpam= bayesArr[1]
-        word2vecArr = word2vecTrain(trainingData,spamData2,0.003)
-        word2vecWeight = word2vecArr[0]
-        word2vecBias = word2vecArr[1]
-        weights,bias = neuralNetwork(oneHotData,spamData,0.003)
-        js.createObject(create_proxy(animals), "animals_from_py")
+        naiveBayesTrain(trainingData,spamData,1000)
+        word2vecTrain(trainingData,spamData2,20,0.003)
+        oneHotTrain(trainingData,spamData,100,20,0.003)
     </py-script>
     <script src = "script.js"></script>
 </body>

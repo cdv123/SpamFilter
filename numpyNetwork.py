@@ -4,7 +4,7 @@ from simplifyDataset import loadSMS2,convertSpamToBinary,loadMessage
 from oneHot import oneHotEncode,oneHotEncode2,getMostCommonWords
 import random
 from word2vec import useEmbedding2,sentenceEmbedding
-def neuralNetwork(trainingData, spamData,lr):
+def neuralNetwork(trainingData, spamData,lr,epochs):
     vectorSize = len(trainingData[0])
     #initialise weights
     w = np.random.rand(vectorSize)
@@ -14,7 +14,7 @@ def neuralNetwork(trainingData, spamData,lr):
     #initialise bias
     b = random.random()
     #train step - 
-    for epoch in range(10):
+    for epoch in range(epochs):
         for x in range(len(trainingData)):
             # Compute prediction
             a = getOutput(trainingData[x],w,b)
@@ -84,7 +84,7 @@ def testNetwork(testData,spamTest,w,b):
     accuarcy = correct/(correct+incorrect)
     return accuarcy
 
-def twoLayerNetwork(trainingData,spamData,lr,hiddenNodesNum):
+def twoLayerNetwork(trainingData,spamData,lr,hiddenNodesNum,epochs):
     vectorSize = len(trainingData[0])
     np.random.seed(0)
     limit= math.sqrt(6/(vectorSize+hiddenNodesNum))
@@ -99,7 +99,7 @@ def twoLayerNetwork(trainingData,spamData,lr,hiddenNodesNum):
     # outputW =np.zeros(hiddenNodesNum)
     # bias scalar to go from hidden layer to output layer
     outputBias = 0
-    for epoch in range(20):
+    for epoch in range(epochs):
         for x in range(len(trainingData)):
             # compute result of hidden layer and final output
             hiddenRes,finalRes = forward_pass(trainingData[x],hiddenW,hiddenBias,outputW,outputBias)
@@ -139,7 +139,6 @@ def forward_pass(x,hiddenW,hiddenBias,outputW,outputBias):
     hiddenOut+= hiddenBias
     hiddenOut = sigmoid(hiddenOut)
     finalOut = np.dot(hiddenOut,outputW)+outputBias
-    print(finalOut)
     return hiddenOut,finalOut
 
 def findResult(x,hiddenW,hiddenBias,outputW,outputBias):

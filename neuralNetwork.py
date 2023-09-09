@@ -12,6 +12,7 @@ class NeuralNetwork:
     def train_network(self,epochs,training_data,result_data,nodes_num,lr):
         vector_size = len(training_data[0])
         if self.layer_num == 1:
+            # train neural network with only input and output layer
             self.weight_matrix,self.bias_vector = self.weight_init(vector_size)
             for epoch in range(epochs):
                 for x in range(len(training_data)):
@@ -24,6 +25,7 @@ class NeuralNetwork:
                     # update weights using gradient loss
                     self.weight_matrix,self.bias_vector = self.update_weights(self.weight_matrix,self.bias_vector,gradw,gradb,lr)
         else:
+            # train neural network with input, one hidden layer and one output layer
             self.weight_matrix,self.weight_vector,self.bias,self.bias_vector = self.weight_init(vector_size,nodes_num)
             for epoch in range(epochs):
                 for x in range(len(training_data)):
@@ -68,8 +70,6 @@ class NeuralNetwork:
         final_res = np.dot(hidden_res,self.weight_vector)+self.bias
         final_res = sigmoid(final_res)
         return hidden_res,final_res
-    def back_prop(self):
-        pass
     def weight_init(self,vector_size,hidden_nodes_num=1):
         np.random.seed(0)
         limit = math.sqrt(6/(vector_size+hidden_nodes_num))

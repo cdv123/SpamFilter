@@ -15,35 +15,34 @@ const oneHotBtn = document.getElementById("btn-one-hot")
 const word2vecBtn = document.getElementById("btn-word2vec")
 const settingInput = document.querySelectorAll("input")
 function createObject(object, variableName){
-    //Bind a variable whose name is the string variableName
-    // to the object called 'object'
-    let execString = variableName + " = object"
-    eval(execString)
+    globalThis[variableName] = object
 }
-
 naiveBayesBtn.addEventListener("click", () => {
+    let naiveBayesTrain = pyscript.interpreter.globals.get('naiveBayesTrain')
     var trainingData = pyscript.interpreter.globals.get('trainingData')
     var spamData = pyscript.interpreter.globals.get('spamData')
-    let naiveBayesTrain = pyscript.interpreter.globals.get('naiveBayesTrain')
-    console.log("hello")
     naiveBayesTrain(trainingData,spamData,parseInt(settingInput[2].value))
-    for (const result of naiveResults){
-        console.log(result["call"])
-    }
+    console.log("done")
 })
 oneHotBtn.addEventListener("click", () => {
+    let oneHotTrain = pyscript.interpreter.globals.get('oneHotTrain')
+    var trainingData = pyscript.interpreter.globals.get('trainingData')
+    var spamData = pyscript.interpreter.globals.get('spamData')
+    oneHotTrain(trainingData,spamData,parseInt(settingInput[3].value),parseInt(settingInput[4].value),parseInt(settingInput[5].value))
+    console.log("done")
 })
 word2vecBtn.addEventListener("click", () => {
+    let word2vecTrain = pyscript.interpreter.globals.get('word2vecTrain')
+    var trainingData = pyscript.interpreter.globals.get('trainingData')
+    var spamData = pyscript.interpreter.globals.get('spamData')
+    word2vecTrain(trainingData,spamData,parseInt(settingInput[7].value),parseInt(settingInput[8].value))
+    console.log("done")
 })
 evalBtn.addEventListener("click", () => {
     modalResults.style.display = "block"
 })
 settingsBtn.addEventListener("click", () =>{
     config.style.display = "inline"
-    for (const animal of animals_from_py){
-        console.log(animal)
-    }
-
 })
 closeResults.addEventListener("click", () => {
     modalResults.style.display = "none"
