@@ -59,20 +59,14 @@ def sampling_rate(frequency):
 def make_matrices(word_dict,pairs):
     focus_matrix = []
     context_matrix = []
-    word_count = len(word_dict)
     for pair in pairs:
         focus_word_index = word_dict[pair[0]]
         context_word_index = word_dict[pair[1]]
-        focus_row = np.zeros(word_count)
-        focus_row[focus_word_index] = 1
-        context_row = np.zeros(word_count)
-        context_row[context_word_index] = 1
-        focus_matrix.append(focus_row)
-        context_matrix.append(context_row)
+        focus_matrix.append(focus_word_index)
+        context_matrix.append(context_word_index)
     return focus_matrix,context_matrix
 
-def skipGramModel(focus_matrix,context_matrix,dim,epochs,lr): 
-    vector_size = np.shape(focus_matrix)[1]
+def skip_gram_model(focus_matrix,context_matrix,dim,epochs,lr,vector_size): 
     np.random.seed(0)
     limit= math.sqrt(6/(vector_size+dim))
     # weight matrix to go from input layer to hidden layer
@@ -90,39 +84,45 @@ def skipGramModel(focus_matrix,context_matrix,dim,epochs,lr):
             hidden_res,final_res = forward_pass(focus_matrix[x],hidden_w,output_w,output_bias)
             # softmax used as multiple classes used
             final_res = softmax(final_res)
-            # 
             loss = loss_function(final_res,context_matrix[x])
             error_der = softmax_der(final_res,context_matrix[x])
-            output_w,output_bias = update_weights(output_w,output_bias,error_der,lr)
-            hidden_loss = np.multiply(hidden_w*loss,hidden_res)
-            # hidden_w = 
-            pass
-def forward_pass(x,hidden_w,output_w):
-    pos = x.index(1)
+            gradb = error_der
+            gradx = compute_gradient(hidden_res,gradb)
+            output_w,output_bias = update_weights(output_w,output_bias,gradx,gradb,lr)
+            # THIS NEEDS TO BE CHANGED
+            hidden_loss = hidden_w*loss
+            grad_hidden_w = compute_hidden_gradient(hidden_loss,focus_matrix[x]) 
+            hidden_w = update_weights(hidden_w,0,grad_hidden_w,0,lr)[0]
+    return hidden_w,output_w,output_bias
+def forward_pass(x,hidden_w,output_w,output_bias):
     # since input vector only has a single 1, the output of the first matrix multiplication 
     # is the row corresponding to the index of this 1
-    hidden_res = hidden_w[pos]
+    hidden_res = hidden_w[x]
     final_res = np.matmul(hidden_res,output_w)
-    #final_res += output_bias
+    final_res += output_bias
     return hidden_res,final_res
 
+def compute_hidden_gradient(errorHidden,vectorInput):
+    gradHiddenW = errorHidden[vectorInput]
+    return gradHiddenW
+
+def compute_gradient(x,gradb):
+    gradb = np.reshape(gradb,(1,-1))
+    x = np.reshape(x,(-1,1))
+    gradx = x*gradb
+    return gradx
+
 def softmax(x):
-    divisor = np.sum(np.exp(x))
-    y = np.exp(x)/divisor
+    y = np.exp(x)/np.sum(np.exp(x))
     return y
 
 def loss_function(yhat,y):
-    cost = -np.sum(y*np.log(yhat))
+    cost = -1*np.log(yhat[y])
     return cost
 
 def softmax_der(yhat,y):
-    return yhat-y
-
-def compute_hidden_gradient():
-    pass
-
-def compute_gradient():
-    pass
+    yhat[y]-=1
+    return yhat
 
 def update_weights(w,b,dw,db,lr):
     w = w-dw*lr
@@ -134,9 +134,10 @@ def subsampling(prob):
     if prob>rnd:
         return True
     return False
-yhat = np.array([0.3,0.2,0.1,0.4])
-y = np.array([0,1,0,0])
-training_data,spam_data = loadSMS2("SMSVal.txt")
+
+def negative_sampling_prob():
+    pass
+training_data,spam_data = loadSMS2("SMSSpamCollection copy.txt")
 text = get_text(training_data)
 text_num = len(text)
 text_set = set(text)
@@ -145,8 +146,10 @@ new_text = set()
 for i in text_set:  
     if subsampling(sampling_rate(text_counter[i]/text_num)): 
         new_text.add(i)
-pairs = make_all_pairs(training_data,5,new_text)
-print(len(pairs))
+pairs = make_all_pairs(training_data,5,text)
+unique_word_dict = uniqueWordDict(text)
+focus_matrix,context_matrix = make_matrices(unique_word_dict,pairs)
+skip_gram_model(focus_matrix,context_matrix,100,10,0.1,len(unique_word_dict))
 # print(len(new_text))
 # text_counter = text_counter.most_common()
 # print(text_counter)
