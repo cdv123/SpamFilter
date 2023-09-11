@@ -75,41 +75,40 @@ def skip_gram_model(focus_matrix,context_matrix,dim,epochs,lr,vector_size):
     limit=math.sqrt(6/(1+dim))
     # weight vector to go from hidden layer to output layer
     output_w = np.random.uniform(-limit,limit,size=(dim,vector_size))
+    loss = 0
     # outputW =np.zeros(hiddenNodesNum)
-    # bias scalar to go from hidden layer to output layer
-    output_bias = np.zeros(vector_size)
     for epoch in range(epochs):
         for x in range(len(focus_matrix)):
             # compute predictions of model
-            hidden_res,final_res = forward_pass(focus_matrix[x],hidden_w,output_w,output_bias)
+            hidden_res,final_res = forward_pass(focus_matrix[x],hidden_w,output_w)
             # softmax used as multiple classes used
             final_res = softmax(final_res)
-            loss = loss_function(final_res,context_matrix[x])
+            loss += loss_function(final_res,context_matrix[x])
             error_der = softmax_der(final_res,context_matrix[x])
-            gradb = error_der
-            gradx = compute_gradient(hidden_res,gradb)
-            output_w,output_bias = update_weights(output_w,output_bias,gradx,gradb,lr)
-            # THIS NEEDS TO BE CHANGED
-            hidden_loss = hidden_w*loss
-            grad_hidden_w = compute_hidden_gradient(hidden_loss,focus_matrix[x]) 
-            hidden_w = update_weights(hidden_w,0,grad_hidden_w,0,lr)[0]
-    return hidden_w,output_w,output_bias
-def forward_pass(x,hidden_w,output_w,output_bias):
+            hidden_w,output_w = back_propagation(output_w,hidden_w,focus_matrix[x],hidden_res,error_der,lr)
+            # gradx = compute_gradient(hidden_res,error_der)
+            # hidden_loss = hidden_w.transpose()*error_der
+            # grad_hidden_w = compute_hidden_gradient(hidden_loss,focus_matrix[x]) 
+            # output_w= update_weights(output_w,gradx,lr)
+            # hidden_w = update_weights(hidden_w,grad_hidden_w,lr)
+        loss = loss/(len(focus_matrix))
+        print(epoch,loss)
+        loss = 0
+    return hidden_w,output_w
+def forward_pass(x,hidden_w,output_w):
     # since input vector only has a single 1, the output of the first matrix multiplication 
     # is the row corresponding to the index of this 1
     hidden_res = hidden_w[x]
-    final_res = np.matmul(hidden_res,output_w)
-    final_res += output_bias
+    final_res = np.dot(hidden_res,output_w)
     return hidden_res,final_res
 
-def compute_hidden_gradient(errorHidden,vectorInput):
-    gradHiddenW = errorHidden[vectorInput]
-    return gradHiddenW
+def compute_hidden_gradient(hidden_loss,vector_input):
+    grad_hidden_w = hidden_loss[:,vector_input]
+    return grad_hidden_w
 
-def compute_gradient(x,gradb):
-    gradb = np.reshape(gradb,(1,-1))
+def compute_gradient(x,error_der):
     x = np.reshape(x,(-1,1))
-    gradx = x*gradb
+    gradx = error_der*x
     return gradx
 
 def softmax(x):
@@ -121,14 +120,19 @@ def loss_function(yhat,y):
     return cost
 
 def softmax_der(yhat,y):
-    yhat[y]-=1
+    yhat[y]-=1  
     return yhat
 
-def update_weights(w,b,dw,db,lr):
+def update_weights(w,dw,lr):
     w = w-dw*lr
-    b = b-db*lr
-    return w,b
+    return w
 
+def back_propagation(output_w,hidden_w,input,hidden_res,error,lr):
+    grad_output_w = np.outer(hidden_res,error)
+    grad_hidden_w = np.dot(output_w,error.T)
+    output_w = output_w - lr*grad_output_w
+    hidden_w[input] = hidden_w[input]-lr*grad_hidden_w
+    return hidden_w,output_w
 def subsampling(prob):
     rnd = random.random()
     if prob>rnd:
@@ -137,7 +141,7 @@ def subsampling(prob):
 
 def negative_sampling_prob():
     pass
-training_data,spam_data = loadSMS2("SMSSpamCollection copy.txt")
+training_data,spam_data = loadSMS2("SMSValidation.txt")
 text = get_text(training_data)
 text_num = len(text)
 text_set = set(text)
@@ -149,7 +153,7 @@ for i in text_set:
 pairs = make_all_pairs(training_data,5,text)
 unique_word_dict = uniqueWordDict(text)
 focus_matrix,context_matrix = make_matrices(unique_word_dict,pairs)
-skip_gram_model(focus_matrix,context_matrix,100,10,0.1,len(unique_word_dict))
-# print(len(new_text))
+skip_gram_model(focus_matrix,context_matrix,50,10,0.01,len(unique_word_dict))
+# print(len(new_text))  
 # text_counter = text_counter.most_common()
 # print(text_counter)
