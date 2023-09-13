@@ -4,6 +4,7 @@ from simplifyDataset import loadSMS2,convertSpamToBinary,loadMessage
 from oneHot import oneHotEncode,oneHotEncode2,getMostCommonWords
 import random
 from word2vec import useEmbedding2,sentenceEmbedding
+import matplotlib.pyplot as plt
 def neuralNetwork(trainingData, spamData,lr,epochs):
     vectorSize = len(trainingData[0])
     #initialise weights
@@ -14,18 +15,20 @@ def neuralNetwork(trainingData, spamData,lr,epochs):
     #initialise bias
     b = random.random()
     #train step - 
+    error = [0]*epochs
     for epoch in range(epochs):
         for x in range(len(trainingData)):
             # Compute prediction
             a = getOutput(trainingData[x],w,b)
             # activation function - normalise value
             a = sigmoid(a)
-            error = BCE(spamData[x],a) 
+            error[epoch]+= BCE(spamData[x],a) 
             # compute gradient loss (actual loss not needed)
             gradw,gradb = computeGradient(trainingData[x],spamData[x],a)
             # update weights using gradient loss
             w,b = updateWeights(w,b,gradw,gradb,lr)
-    return w,b
+        error[epoch] = error[epoch]/len(trainingData)
+    return w,b,error
 
 def sigmoid(x):
     return (1/(1+(np.exp(-x))))
@@ -71,8 +74,6 @@ def testNetwork(testData,spamTest,w,b):
     predictions = []
     for i in range(len(outputs)):
         if sigmoid(outputs[i])>0.5:
-            if i == 11:
-                print(testData[i],spamTest[i])
             predictions.append(1)
         else:
             predictions.append(0)
@@ -168,15 +169,15 @@ def testTwoLayer(testData,spamData,hiddenW,hiddenBias,outputW,outputBias):
 # vector_size = 300
 # embeddingDict = useEmbedding2()
 # trainSentences = sentenceEmbedding(trainingData,spamData,embeddingDict,100)
-# # mostCommonWords = getMostCommonWords(trainingData,vector_size)
-# # oneHotTrain = list(oneHotEncode(trainingData,mostCommonWords).values())
-# weights,bias,hiddenW,hiddenBias = twoLayerNetwork(trainSentences,spamData,0.004,9)
-# # weights,bias = neuralNetwork(trainSentences,spamData,0.003)
-# # print(bias)
+# # # mostCommonWords = getMostCommonWords(trainingData,vector_size)
+# # # oneHotTrain = list(oneHotEncode(trainingData,mostCommonWords).values())
+# # weights,bias,hiddenW,hiddenBias = twoLayerNetwork(trainSentences,spamData,0.004,9)
+# weights,bias,error = neuralNetwork(trainSentences,spamData,0.003,20)
+# # # print(bias)
 # testData, spamTest = loadSMS2('SMSTest.txt')
-# # oneHotTest = list(oneHotEncode(testData,mostCommonWords).values())
+# # # oneHotTest = list(oneHotEncode(testData,mostCommonWords).values())
 # spamTest = convertSpamToBinary(spamTest)
 # testSentences = sentenceEmbedding(testData,spamTest,embeddingDict,100)
-# print(testTwoLayer(testSentences,spamTest,weights,bias,hiddenW,hiddenBias))
+# print(testNetwork(testSentences,spamTest,weights,bias))
 
 

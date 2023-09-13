@@ -77,6 +77,7 @@
         from pyodide.http import to_js
         import js
         from pyodide.ffi import create_proxy
+        import matplotlib.pyplot as plt
         trainingText = open_url("https://raw.githubusercontent.com/cdv123/SpamFilter/webversion/Dataset/SMSSpamCollection.txt")
         customEmbedding = open_url("https://raw.githubusercontent.com/cdv123/SpamFilter/webversion/Dataset/customEmbedding.txt")
         trainingText = trainingText.read()
@@ -109,6 +110,8 @@
             word2vecWeights = resultArr[0]
             global word2vecBias
             word2vecBias = resultArr[1]
+            error = resultArr[2]
+            return error
         def useOneHot(weights,bias,message):
             message = loadMessage(message)
             oneHotData = oneHotEncode2(message,mostCommonWords)
@@ -118,8 +121,11 @@
             wordVector = messageEmbedding(message,embeddingDict,100)
             return sigmoid(getOutput(wordVector,weights,bias))
         naiveBayesTrain(trainingData,spamData,1000)
-        word2vecTrain(trainingData,spamData2,20,0.003)
+        error = word2vecTrain(trainingData,spamData2,20,0.003)
         oneHotTrain(trainingData,spamData,100,20,0.003)
+        fig,ax = plt.subplots()
+        ax.plot(error,range(20))
+        display(fig)
     </py-script>
     <script src = "script.js"></script>
 </body>

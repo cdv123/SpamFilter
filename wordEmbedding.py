@@ -209,25 +209,25 @@ def preprocess_text(training_data):
 training_data,spam_data = loadSMS2("SMSSpamCollection.txt")
 new_text,unique_word_dict,focus_matrix,context_matrix = preprocess_text(training_data)
 # mini_batches = make_mini_batches(focus_matrix,context_matrix,32)
-hidden_w = skip_gram_model(focus_matrix,context_matrix,50,3,0.000015,list(new_text),unique_word_dict,20)
+# hidden_w = skip_gram_model(focus_matrix,context_matrix,50,3,0.000015,list(new_text),unique_word_dict,20)
 # hidden_w = skip_gram_model(focus_matrix,context_matrix,50,3,0.0004,list(new_text),unique_word_dict,20)
-# cProfile.run('skip_gram_model(focus_matrix,context_matrix,50,6,0.3,list(new_text),unique_word_dict,20)')
-word_embedding = {}
-for i in unique_word_dict:
-    word_embedding[i] = hidden_w[unique_word_dict[i]]
-# training_data2,spam_data2 = loadSMS2('SMSSpamCollection.txt')
-spam_data = convertSpamToBinary(spam_data)
-vector_size = 50    
-trainSentences = sentenceEmbedding(training_data,spam_data,word_embedding,50)
+cProfile.run('skip_gram_model(focus_matrix,context_matrix,50,3,0.000015,list(new_text),unique_word_dict,20)')
+# word_embedding = {}
+# for i in unique_word_dict:
+#     word_embedding[i] = hidden_w[unique_word_dict[i]]
+# # training_data2,spam_data2 = loadSMS2('SMSSpamCollection.txt')
+# spam_data = convertSpamToBinary(spam_data)
+# vector_size = 50    
+# trainSentences = sentenceEmbedding(training_data,spam_data,word_embedding,50)
 # mostCommonWords = getMostCommonWords(trainingData,vector_size)
 # oneHotTrain = list(oneHotEncode(trainingData,mostCommonWords).values())
 # weights,bias,hiddenW,hiddenBias = neuralNetwork(trainSentences,spam_data,0.004,9)
-hidden_weights,hidden_bias,output_weights,output_bias = twoLayerNetwork(trainSentences,spam_data,0.0002,9,20)
+# hidden_weights,hidden_bias,output_weights,output_bias = twoLayerNetwork(trainSentences,spam_data,0.0002,9,20)
 # print(bias)
-testData, spamTest = loadSMS2('SMSTest.txt')
-# oneHotTest = list(oneHotEncode(testData,mostCommonWords).values())
-spamTest = convertSpamToBinary(spamTest)
-testSentences = sentenceEmbedding(testData,spamTest,word_embedding,50)
-# print(testNetwork(testSentences,spamTest,weights,bias))
-print(testTwoLayer(testSentences,spamTest,hidden_weights,hidden_bias,output_weights,output_bias))
+# testData, spamTest = loadSMS2('SMSTest.txt')
+# # oneHotTest = list(oneHotEncode(testData,mostCommonWords).values())
+# spamTest = convertSpamToBinary(spamTest)
+# testSentences = sentenceEmbedding(testData,spamTest,word_embedding,50)
+# # print(testNetwork(testSentences,spamTest,weights,bias))
+# print(testTwoLayer(testSentences,spamTest,hidden_weights,hidden_bias,output_weights,output_bias))
 
