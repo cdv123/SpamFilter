@@ -9,6 +9,11 @@ h1{
 *{
     color: #282B28;
 }
+img{
+    position: fixed;
+    top: 17%;
+    right: 30%;
+}
 #msg-label{
     margin-top: 2%;
     margin-right: 20%;

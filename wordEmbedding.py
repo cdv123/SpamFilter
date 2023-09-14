@@ -206,12 +206,12 @@ def preprocess_text(training_data):
     unique_word_dict = uniqueWordDict(text)
     focus_matrix,context_matrix = make_matrices_2(unique_word_dict,pairs)
     return new_text,unique_word_dict,focus_matrix,context_matrix
-training_data,spam_data = loadSMS2("SMSSpamCollection.txt")
-new_text,unique_word_dict,focus_matrix,context_matrix = preprocess_text(training_data)
+# training_data,spam_data = loadSMS2("SMSSpamCollection.txt")
+# new_text,unique_word_dict,focus_matrix,context_matrix = preprocess_text(training_data)
 # mini_batches = make_mini_batches(focus_matrix,context_matrix,32)
 # hidden_w = skip_gram_model(focus_matrix,context_matrix,50,3,0.000015,list(new_text),unique_word_dict,20)
 # hidden_w = skip_gram_model(focus_matrix,context_matrix,50,3,0.0004,list(new_text),unique_word_dict,20)
-cProfile.run('skip_gram_model(focus_matrix,context_matrix,50,3,0.000015,list(new_text),unique_word_dict,20)')
+# cProfile.run('skip_gram_model(focus_matrix,context_matrix,50,3,0.000015,list(new_text),unique_word_dict,20)')
 # word_embedding = {}
 # for i in unique_word_dict:
 #     word_embedding[i] = hidden_w[unique_word_dict[i]]

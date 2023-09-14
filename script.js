@@ -90,10 +90,10 @@ function trainModels(){
 function showX(){
     let message = messageInput.value
     loadMessage = pyscript.interpreter.globals.get('loadMessage')
-    let oneHotWeights = pyscript.interpreter.globals.get('weights')
-    let oneHotBias = pyscript.interpreter.globals.get('bias')
+    let oneHotWeights = pyscript.interpreter.globals.get('oneHotWeights')
+    let oneHotBias = pyscript.interpreter.globals.get('oneHotBias')
     let wordProbHam = pyscript.interpreter.globals.get('wordProbHam') 
-    let word2vecWeights = pyscript.interpreter.globals.get('word2vecWeight')
+    let word2vecWeights = pyscript.interpreter.globals.get('word2vecWeights')
     let word2vecBias = pyscript.interpreter.globals.get('word2vecBias')
     let wordProbSpam = pyscript.interpreter.globals.get('wordProbSpam')
     naiveBayesFun = pyscript.interpreter.globals.get('analyseMsg')

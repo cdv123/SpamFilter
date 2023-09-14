@@ -66,66 +66,85 @@
         </p>
  
     </div>
-    <py-script>
-        import numpy as np
-        from word2vec import sentenceEmbedding, useEmbedding, messageEmbedding
-        from oneHot import oneHotEncode,getMostCommonWords,oneHotEncode2
-        from numpyNetwork import neuralNetwork,getOutput, sigmoid
-        from simplifyDataset import loadSMS,convertSpamToBinary,loadMessage
-        from naiveBayesMethod import trainModel, analyseMsg
-        from pyodide.http import open_url
-        from pyodide.http import to_js
-        import js
-        from pyodide.ffi import create_proxy
-        import matplotlib.pyplot as plt
-        trainingText = open_url("https://raw.githubusercontent.com/cdv123/SpamFilter/webversion/Dataset/SMSSpamCollection.txt")
-        customEmbedding = open_url("https://raw.githubusercontent.com/cdv123/SpamFilter/webversion/Dataset/customEmbedding.txt")
-        trainingText = trainingText.read()
-        customEmbedding = customEmbedding.read()
-        trainingData,spamData = loadSMS(trainingText)
-        spamData = convertSpamToBinary(spamData)
-        spamData2 = spamData[:]
-        global oneHotWeights,oneHotBias
-        global word2vecWeights,word2vecBias
-        global wordProbHam,wordProbSpam
-        embeddingDict = useEmbedding(customEmbedding)
-        def oneHotTrain(trainingData,spamData,vectorSize,epochs,lr):
-            mostCommonWords = getMostCommonWords(trainingData,vectorSize)
-            oneHotData = list(oneHotEncode(trainingData,mostCommonWords).values())
-            resultArr = neuralNetwork(oneHotData,spamData,lr,epochs)
-            global oneHotWeights
-            oneHotWeights = resultArr[0]
-            global oneHotBias
-            oneHotBias = resultArr[1]
-        def naiveBayesTrain(trainingData,spamData,wordNum):
-            resultArr = trainModel(trainingData,spamData,wordNum)
-            global wordProbHam 
-            wordProbHam= resultArr[0]
-            global wordProbSpam
-            wordProbSpam = resultArr[1]
-        def word2vecTrain(trainingData,spamData,epochs,lr):
-            trainSentences = sentenceEmbedding(trainingData,spamData,embeddingDict,100)
-            resultArr = neuralNetwork(trainSentences,spamData,lr,epochs)
-            global word2vecWeights
-            word2vecWeights = resultArr[0]
-            global word2vecBias
-            word2vecBias = resultArr[1]
-            error = resultArr[2]
-            return error
-        def useOneHot(weights,bias,message):
-            message = loadMessage(message)
-            oneHotData = oneHotEncode2(message,mostCommonWords)
-            return sigmoid(getOutput(oneHotData,weights,bias))
-        def useWord2Vec(weights,bias,message):
-            message = loadMessage(message)
-            wordVector = messageEmbedding(message,embeddingDict,100)
-            return sigmoid(getOutput(wordVector,weights,bias))
-        naiveBayesTrain(trainingData,spamData,1000)
-        error = word2vecTrain(trainingData,spamData2,20,0.003)
-        oneHotTrain(trainingData,spamData,100,20,0.003)
+    <py-script> 
+    import numpy as np
+    from word2vec import sentenceEmbedding, useEmbedding, messageEmbedding
+    from oneHot import oneHotEncode,getMostCommonWords,oneHotEncode2
+    from numpyNetwork import neuralNetwork,getOutput, sigmoid
+    from simplifyDataset import loadSMS,convertSpamToBinary,loadMessage
+    from naiveBayesMethod import trainModel, analyseMsg
+    from pyodide.http import open_url
+    from pyodide.http import to_js
+    import js
+    from pyodide.ffi import create_proxy
+    import matplotlib.pyplot as plt
+    trainingText = open_url("https://raw.githubusercontent.com/cdv123/SpamFilter/webversion/Dataset/SMSSpamCollection.txt")
+    customEmbedding = open_url("https://raw.githubusercontent.com/cdv123/SpamFilter/webversion/Dataset/customEmbedding.txt")
+    trainingText = trainingText.read()
+    customEmbedding = customEmbedding.read()
+    trainingData,spamData = loadSMS(trainingText)
+    spamData = convertSpamToBinary(spamData)
+    spamData2 = spamData[:]
+    global oneHotWeights,oneHotBias
+    global word2vecWeights,word2vecBias
+    global wordProbHam,wordProbSpam
+    global mostCommonWords
+    vector_size = 100
+    embeddingDict = useEmbedding(customEmbedding)
+    def oneHotTrain(trainingData,spamData,vector_size,epochs,lr):
+        global mostCommonWords
+        mostCommonWords = getMostCommonWords(trainingData,vector_size)
+        oneHotData = list(oneHotEncode(trainingData,mostCommonWords).values())
+        resultArr = neuralNetwork(oneHotData,spamData,lr,epochs)
+        global oneHotWeights
+        oneHotWeights = resultArr[0]
+        global oneHotBias
+        oneHotBias = resultArr[1]
+    def naiveBayesTrain(trainingData,spamData,wordNum):
+        resultArr = trainModel(trainingData,spamData,wordNum)
+        global wordProbHam 
+        wordProbHam= resultArr[0]
+        global wordProbSpam
+        wordProbSpam = resultArr[1]
+    def word2vecTrain(trainingData,spamData,epochs,lr):
+        trainSentences = sentenceEmbedding(trainingData,spamData,embeddingDict,100)
+        resultArr = neuralNetwork(trainSentences,spamData,lr,epochs)
+        global word2vecWeights
+        word2vecWeights = resultArr[0]
+        global word2vecBias
+        word2vecBias = resultArr[1]
+    def useOneHot(weights,bias,message):
+        global mostCommonWords
+        message = loadMessage(message)
+        oneHotData = oneHotEncode2(message,mostCommonWords)
+        return sigmoid(getOutput(oneHotData,weights,bias))
+    def useWord2Vec(weights,bias,message):
+        message = loadMessage(message)
+        wordVector = messageEmbedding(message,embeddingDict)
+        return sigmoid(getOutput(wordVector,weights,bias))
+            
+    def plt_style():
+        plt.rcParams['figure.autolayout'] = True
+        plt.rcParams['figure.figsize'] = [6.4, 4.8]
+        plt.rcParams['font.family'] ='serif'
+        plt.rcParams['font.size'] = 12
+        plt.rcParams['xtick.direction'] = 'in'
+        plt.rcParams['ytick.direction'] = 'in'
+        plt.rcParams['axes.linewidth'] = 1.0
+        plt.rcParams['errorbar.capsize'] = 6
+        plt.rcParams['lines.markersize'] = 6
+        plt.rcParams['lines.markerfacecolor'] = 'white'
+        plt.rcParams['mathtext.fontset'] = 'cm'
+    def plot(error,epochs):
+        plt_style()
         fig,ax = plt.subplots()
-        ax.plot(error,range(20))
+        ax.set_xlabel('Epoch')
+        ax.set_ylabel('Training Loss')
+        ax.plot(error,range(epochs))
         display(fig)
+    naiveBayesTrain(trainingData,spamData,1000)
+    word2vecTrain(trainingData,spamData2,20,0.003)
+    oneHotTrain(trainingData,spamData,vector_size,20,0.003)
     </py-script>
     <script src = "script.js"></script>
 </body>

@@ -58,6 +58,7 @@ def sentenceEmbedding(data,spamList,word2vec,vector_size):
             sentenceEmbeddings.append(sentence)
         i+=1
     return sentenceEmbeddings
+
 def messageEmbedding(message,word2vec,vector_size):
     message_words = message.split(" ")
     sentence = np.zeros(vector_size)
