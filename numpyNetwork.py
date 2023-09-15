@@ -99,8 +99,10 @@ def twoLayerNetwork(trainingData,spamData,lr,hiddenNodesNum,epochs,val_data,val_
     vectorSize = len(trainingData[0])
     np.random.seed(0)
     limit= math.sqrt(6/(vectorSize+hiddenNodesNum))
+    # limit = math.sqrt(2/vectorSize)
     # weight matrix to go from input layer to hidden layer
-    hiddenW = np.random.uniform(-limit,limit,size=(vectorSize,hiddenNodesNum))
+    hiddenW = np.random.normal(0,limit,size=(vectorSize,hiddenNodesNum))
+    # hiddenW = np.random.uniform(-limit,limit,size=(vectorSize,hiddenNodesNum))
     # hiddenW = np.zeros((vectorSize,hiddenNodesNum))
     # bias vector to go from input layer to hidden layer
     hiddenBias = np.zeros(hiddenNodesNum)
@@ -128,10 +130,11 @@ def twoLayerNetwork(trainingData,spamData,lr,hiddenNodesNum,epochs,val_data,val_
             # binary cross entropy used to measure error, equation for ouput layer only equation dependent on cost function
             errorDer = BCEgrad(spamData[x],finalRes)
             outputError = np.multiply(errorDer,finalRes*(1-finalRes))
+            # contribution of hidden layer to error
+            errorHidden = np.multiply(hiddenW*outputError,derReLu(hiddenRes))
+            hiddenRes = ReLu(hiddenRes)
             # error gradient of outputW and outputB
             gradOutputW, gradOutputB = computeGradient(hiddenRes,spamData[x],finalRes)
-            # contribution of hidden layer to error
-            errorHidden = np.multiply(hiddenW*outputError,hiddenRes*(1-hiddenRes))
             # update parameters to go from hidden layer to output layer
             outputW,outputBias = updateWeights(outputW,outputBias,gradOutputW,gradOutputB,lr)
             # error gradient of hiddenW and hiddenB
@@ -151,20 +154,21 @@ def ReLu(x):
     return np.maximum(0,x)         
 
 def derReLu(x):
-    arr=[1 if i > 0  else 0 for i in x]
-    gradx = np.multiply(x,arr)
-    return gradx
+    arr=[1 if i >= 0  else 0 for i in x]
+    return arr
 
 def forward_pass(x,hiddenW,hiddenBias,outputW,outputBias):
     hiddenOut = np.matmul(x,hiddenW)
     hiddenOut+= hiddenBias
-    hiddenOut = sigmoid(hiddenOut)
+    # hiddenOut = sigmoid(hiddenOut)
+    # hiddenOut = ReLu(hiddenOut)
     finalOut = np.dot(hiddenOut,outputW)+outputBias
     return hiddenOut,finalOut
 
 def findResult(x,hiddenW,hiddenBias,outputW,outputBias):
     hiddenOut = np.matmul(x,hiddenW)+hiddenBias
-    hiddenOut = sigmoid(hiddenOut)
+    # hiddenOut = sigmoid(hiddenOut)
+    hiddenOut = ReLu(hiddenOut)
     finalOut = np.dot(hiddenOut,outputW)+outputBias
     finalOut = sigmoid(finalOut)
     return finalOut
@@ -184,32 +188,33 @@ def testTwoLayer(testData,spamData,hiddenW,hiddenBias,outputW,outputBias):
         if prediction == spamData[i]:
             correctCount+=1
     return correctCount/len(testData)
-trainingData,spamData = loadSMS2('SMSSpamCollection.txt')
-spamData = convertSpamToBinary(spamData)
-valData,spamVal = loadSMS2('SMSVal.txt')
-spamVal = convertSpamToBinary(spamVal)
-vector_size = 300
-embeddingDict = useEmbedding2()
+# trainingData,spamData = loadSMS2('SMSSpamCollection.txt')
+# spamData = convertSpamToBinary(spamData)
+# valData,spamVal = loadSMS2('SMSVal.txt')
+# spamVal = convertSpamToBinary(spamVal)
+# vector_size = 100
+# embeddingDict = useEmbedding2()
 # trainSentences = sentenceEmbedding(trainingData,spamData,embeddingDict,100)
 # valSentences = sentenceEmbedding(valData,spamVal,embeddingDict,100)
-mostCommonWords = getMostCommonWords(trainingData,vector_size)
-oneHotTrain = list(oneHotEncode(trainingData,mostCommonWords).values())
-oneHotVal = list(oneHotEncode(valData,mostCommonWords).values())
-hiddenW,hiddenBias,weights,bias,error,error_val = twoLayerNetwork(oneHotTrain,spamData,0.0005,9,20,oneHotVal,spamVal)
-# hiddenW,hiddenBias,weights,bias,error,error_val = twoLayerNetwork(oneHotTrain,spamData,0.004,9,10,oneHotVal,spamVal)
-# weights,bias,error,error_val = neuralNetwork(trainSentences,spamData,0.001,20,valSentences,spamVal)
-# weights,bias,error,error_val = neuralNetwork(oneHotTrain,spamData,0.03,10,oneHotVal,spamVal)
-# # print(bias)
-plt.plot(range(20),error, label = "Training Loss")
-plt.plot(range(20),error_val, label = "Validation Loss")
-plt.legend()
-plt.show()
-testData, spamTest = loadSMS2('SMSTest.txt')
-oneHotTest = list(oneHotEncode(testData,mostCommonWords).values())
-spamTest = convertSpamToBinary(spamTest)
+# # mostCommonWords = getMostCommonWords(trainingData,vector_size)
+# # oneHotTrain = list(oneHotEncode(trainingData,mostCommonWords).values())
+# # oneHotVal = list(oneHotEncode(valData,mostCommonWords).values())
+# # hiddenW,hiddenBias,weights,bias,error,error_val = twoLayerNetwork(oneHotTrain,spamData,0.00025,9,20,oneHotVal,spamVal)
+# # hiddenW,hiddenBias,weights,bias,error,error_val = twoLayerNetwork(oneHotTrain,spamData,0.004,9,10,oneHotVal,spamVal)
+# hiddenW,hiddenBias,weights,bias,error,error_val = twoLayerNetwork(trainSentences,spamData,0.004,9,10,valSentences,spamVal)
+# # weights,bias,error,error_val = neuralNetwork(trainSentences,spamData,0.001,20,valSentences,spamVal)
+# # weights,bias,error,error_val = neuralNetwork(oneHotTrain,spamData,0.03,10,oneHotVal,spamVal)
+# # # print(bias)
+# plt.plot(range(10),error, label = "Training Loss")
+# plt.plot(range(10),error_val, label = "Validation Loss")
+# plt.legend()
+# plt.show()
+# testData, spamTest = loadSMS2('SMSTest.txt')
+# # oneHotTest = list(oneHotEncode(testData,mostCommonWords).values())
+# spamTest = convertSpamToBinary(spamTest)
 # testSentences = sentenceEmbedding(testData,spamTest,embeddingDict,100)
 # print(testTwoLayer(testSentences,spamTest,hiddenW,hiddenBias,weights,bias))
-print(testTwoLayer(oneHotTest,spamTest,hiddenW,hiddenBias,weights,bias))
+# print(testTwoLayer(oneHotTest,spamTest,hiddenW,hiddenBias,weights,bias))
 # print(testNetwork(testSentences,spamTest,weights,bias))
 # print(testNetwork(oneHotTest,spamTest,weights,bias))
 

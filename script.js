@@ -6,9 +6,7 @@ const settingsBtn = document.getElementById("settings-btn")
 const config = document.getElementById("config")
 const closeConfig = document.getElementById("close-config")
 const closeResults = document.getElementById("close-results")
-const checkBoxOneHot = document.getElementById("checkbox-one-hot")
 const checkBoxWord2Vec = document.getElementById("checkbox-word2vec")
-const hiddenOneHot = document.querySelectorAll(".hidden-one-hot")
 const hiddenWord2Vec = document.querySelectorAll(".hidden-word2vec")
 const naiveBayesBtn = document.getElementById("btn-naive-bayes")
 const oneHotBtn = document.getElementById("btn-one-hot")
@@ -19,23 +17,31 @@ function createObject(object, variableName){
 }
 naiveBayesBtn.addEventListener("click", () => {
     let naiveBayesTrain = pyscript.interpreter.globals.get('naiveBayesTrain')
-    var trainingData = pyscript.interpreter.globals.get('trainingData')
-    var spamData = pyscript.interpreter.globals.get('spamData')
-    naiveBayesTrain(trainingData,spamData,parseInt(settingInput[2].value))
+    let trainingData = pyscript.interpreter.globals.get('trainingData')
+    let spamData = pyscript.interpreter.globals.get('spamData')
+    console.log(parseFloat(settingInput[1].value))
+    naiveBayesTrain(trainingData,spamData,parseInt(settingInput[2].value),parseFloat(settingInput[1].value))
     console.log("done")
 })
 oneHotBtn.addEventListener("click", () => {
     let oneHotTrain = pyscript.interpreter.globals.get('oneHotTrain')
-    var trainingData = pyscript.interpreter.globals.get('trainingData')
-    var spamData = pyscript.interpreter.globals.get('spamData')
-    oneHotTrain(trainingData,spamData,parseInt(settingInput[3].value),parseInt(settingInput[4].value),parseInt(settingInput[5].value))
+    let trainingData = pyscript.interpreter.globals.get('trainingData')
+    let valData = pyscript.interpreter.globals.get('valData')
+    let valSpam = pyscript.interpreter.globals.get('valSpam')
+    let spamData = pyscript.interpreter.globals.get('spamData')
+    oneHotTrain(trainingData,spamData,valData,valSpam,parseInt(settingInput[3].value),parseInt(settingInput[4].value),parseInt(settingInput[5].value),true)
     console.log("done")
 })
 word2vecBtn.addEventListener("click", () => {
+    let valData = pyscirpt.interpreter.globals.get('valData')
+    let valSpam = pyscirpt.interpreter.globals.get('valSpam')
     let word2vecTrain = pyscript.interpreter.globals.get('word2vecTrain')
-    var trainingData = pyscript.interpreter.globals.get('trainingData')
-    var spamData = pyscript.interpreter.globals.get('spamData')
-    word2vecTrain(trainingData,spamData,parseInt(settingInput[7].value),parseInt(settingInput[8].value))
+    let trainingData = pyscript.interpreter.globals.get('trainingData')
+    let spamData = pyscript.interpreter.globals.get('spamData')
+    // if (checkBoxWord2Vec.checked){
+
+    // }
+    word2vecTrain(trainingData,spamData,valData,valSpam,parseInt(settingInput[6].value),parseInt(settingInput[7].value),true)
     console.log("done")
 })
 evalBtn.addEventListener("click", () => {
@@ -51,56 +57,33 @@ closeResults.addEventListener("click", () => {
 closeConfig.addEventListener("click", () => {
     config.style.display = "none"
 })
-checkBoxOneHot.addEventListener("click", () => {
-    if (checkBoxOneHot.checked){
-        for (let i = 0; i<hiddenOneHot.length; i++){
-            hiddenOneHot[i].style.display = "inline"
-        }
-    }
-    else{
-        for (let i = 0; i<hiddenWord2Vec.length; i++){
-            hiddenOneHot[i].style.display = "none"
-        }
-    }
-})
 checkBoxWord2Vec.addEventListener("click", () => {
     if (checkBoxWord2Vec.checked){
         for (let i = 0; i<hiddenWord2Vec.length; i++){
             hiddenWord2Vec[i].style.display = "inline"
         }
+        settingInput[7].value = 0.00002
     }
     else{
         for (let i = 0; i<hiddenWord2Vec.length; i++){
             hiddenWord2Vec[i].style.display = "none"
         }
+        settingInput[7].value = 0.03
     }
 })
-function trainModels(){
-    trainingData = pyscript.interpreter.globals.get('trainingData')
-    spamData = pyscript.interpreter.globals.get('spamData')
-    oneHotTrain = pyscript.interpreter.globals.get('oneHotTrain')
-    oneHotRes = oneHotTrain(trainingData,spamData,300)
-    naiveBayesTrain = pyscript.interpreter.globals.get('naiveBayesTrain')
-    wordProb = naivesBayesTrain(trainingData,spamData)
-    let probHam = wordProb[0]
-    let probSpam = wordProb[1]
-    word2vecTrain = pyscript.interpreter.globals.get('word2vecTrain')
-    word2vecRes = word2vecTrain(trainingData,spamData,300)
-}
 function showX(){
     let message = messageInput.value
     loadMessage = pyscript.interpreter.globals.get('loadMessage')
-    let oneHotWeights = pyscript.interpreter.globals.get('oneHotWeights')
-    let oneHotBias = pyscript.interpreter.globals.get('oneHotBias')
+    let oneHotModel = pyscript.interpreter.globals.get('one_hot_model')
     let wordProbHam = pyscript.interpreter.globals.get('wordProbHam') 
-    let word2vecWeights = pyscript.interpreter.globals.get('word2vecWeights')
-    let word2vecBias = pyscript.interpreter.globals.get('word2vecBias')
     let wordProbSpam = pyscript.interpreter.globals.get('wordProbSpam')
-    naiveBayesFun = pyscript.interpreter.globals.get('analyseMsg')
+    let priorSpam = pyscript.interpreter.globals.get('priorSpam')
+    let word2vecModel = pyscript.interpreter.globals.get('word2vec_model')
     message = loadMessage(message)
+    naiveBayesFun = pyscript.interpreter.globals.get('analyseMsg')
     oneHotFun = pyscript.interpreter.globals.get('useOneHot')
-    word2vecFun =pyscript.interpreter.globals.get('useWord2Vec')
-    modelResults = [naiveBayesFun(wordProbHam,wordProbSpam,message),oneHotFun(oneHotWeights,oneHotBias,message),word2vecFun(word2vecWeights,word2vecBias,message)]
+    word2vecFun = pyscript.interpreter.globals.get('useWord2Vec')
+    modelResults = [naiveBayesFun(wordProbHam,wordProbSpam,message,priorSpam),oneHotFun(oneHotModel,message),word2vecFun(word2vecModel,message)]
     createChart(modelResults)
 }
 function createChart(modelResults){
@@ -152,7 +135,4 @@ function createChart(modelResults){
     } 
 function deleteChart(){
     d3.select('svg').remove();
-}
-function showConfig(){
-
 }

@@ -9,10 +9,16 @@ h1{
 *{
     color: #282B28;
 }
-img{
+/* img{
     position: fixed;
     top: 17%;
     right: 30%;
+} */
+#plot{
+    position: fixed;
+    top: 17%;
+    right: 30%;
+    z-index: 51;
 }
 #msg-label{
     margin-top: 2%;

@@ -14,7 +14,7 @@
         packages= ["numpy","matplotlib"]
         [[fetch]]
         from = "./"
-        files =["numpyNetwork.py", "word2vec.py", "simplifyDataset.py", "numpyNetwork.py", "oneHot.py","naiveBayesMethod.py"]
+        files =["numpyNetwork.py", "word2vec.py", "simplifyDataset.py", "numpyNetwork.py", "oneHot.py","naiveBayesMethod.py","neuralNetwork.py"]
     </py-config>
 </head>
 <body>
@@ -28,43 +28,39 @@
         <div id = "results-chart"></div>
     </div> 
     <button id = "settings-btn"> Settings</button>
+    <div id = "plot"> </div>
     <div id = "config">
         <button class = "close-btn" id = "close-config">X</button>
         <p class = "line">
             <p class = "model">Naive Bayes Model:</p>
             <p class = "epoch-num">Prior spam probability</p>
-            <input class ="number-input" type="number" name="" value="0.50">
+            <input class ="number-input" type="number" name="" value="0.50" min ="0" max = "1" onkeydown="this.style.width = ((this.value.length + 1) * 9) + 'px';">
             <p class = "setting">Words Used</p>
-            <input class ="number-input" type="number" name="" value="1000">
+            <input class ="number-input" type="number" name="" value="1000" onkeydown="this.style.width = ((this.value.length + 1) * 9) + 'px';">
             <button id = "btn-naive-bayes" class = "confirm-settings">Confirm and Retrain Naive Bayes</button>
         </p>
         <p class = "line">
             <p class = "model">One-Hot Model:</p>
             <p class = "epoch-num">Vector Size:</p>
-            <input class ="number-input" type="number" name="" value="300">
+            <input class ="number-input" type="number" name="" value="100" onkeydown="this.style.width = ((this.value.length + 1) * 9) + 'px';">
             <p class = "epoch-num">Number of epochs:</p>
-            <input class ="number-input" type="number" name="" value="20">
+            <input class ="number-input" type="number" name="" value="20" min = "0" onkeydown="this.style.width = ((this.value.length + 1) * 9) + 'px';">
             <p class = "setting">Learning Rate:</p>
-            <input class = "number-input" type="number" name="" value="0.03">
-            <p class = "add-hidden">Add hidden layer</p>
-            <input id = "checkbox-one-hot" class = "hidden-layer" type="checkbox" name="" value="">
-            <p class = "hidden-nodes-num hidden-one-hot">Number of nodes in hidden layer:</p>
-            <input class = "hidden-nodes hidden-one-hot" type="" name="" value="9">
+            <input class = "number-input" type="number" name="" value="0.03" onkeydown="this.style.width = ((this.value.length + 1) * 9) + 'px';">
             <button id = "btn-one-hot" class = "confirm-settings">Confirm and Retrain One-Hot</button>
         </p>
         <p class = "line">
             <p class = "model">Word2Vec Model:</p>
             <p class = "epoch-num">Number of epochs:</p>
-            <input class = "number-input" type="number" name="" value="20">
+            <input class = "number-input" type="number" name="" value="20" min = "0" onkeydown="this.style.width = ((this.value.length + 1) * 9) + 'px';">
             <p class = "setting">Learning Rate:</p>
-            <input class = "number-input" type="number" name="" value="0.03">
+            <input class = "number-input" type="number" name="" value="0.03" onkeydown="this.style.width = ((this.value.length + 1) * 9) + 'px';">
             <p class = "add-hidden">Add hidden layer</p>
             <input id = "checkbox-word2vec" class = "hidden-layer" type="checkbox" name="" value="">
             <p class = "hidden-nodes-num hidden-word2vec">Number of nodes in hidden layer:</p>
-            <input class = "hidden-nodes hidden-word2vec" type="" name="" value="9">
+            <input class = "hidden-nodes hidden-word2vec" type="" name="" value="9" onkeydown="this.style.width = ((this.value.length + 1) * 9) + 'px';">
             <button id = "btn-word2vec" class = "confirm-settings">Confirm and Retrain Word2Vec</button>
         </p>
- 
     </div>
     <py-script> 
     import numpy as np
@@ -78,50 +74,59 @@
     import js
     from pyodide.ffi import create_proxy
     import matplotlib.pyplot as plt
+    from neuralNetwork import NeuralNetwork
     trainingText = open_url("https://raw.githubusercontent.com/cdv123/SpamFilter/webversion/Dataset/SMSSpamCollection.txt")
     customEmbedding = open_url("https://raw.githubusercontent.com/cdv123/SpamFilter/webversion/Dataset/customEmbedding.txt")
+    valText = open_url("https://raw.githubusercontent.com/cdv123/SpamFilter/webversion/Dataset/SMSVal.txt")
     trainingText = trainingText.read()
+    valText = valText.read()
     customEmbedding = customEmbedding.read()
     trainingData,spamData = loadSMS(trainingText)
+    valData,valSpam = loadSMS(valText)
     spamData = convertSpamToBinary(spamData)
     spamData2 = spamData[:]
-    global oneHotWeights,oneHotBias
-    global word2vecWeights,word2vecBias
-    global wordProbHam,wordProbSpam
-    global mostCommonWords
+    valSpam = convertSpamToBinary(valSpam)
+    valSpam2 = valSpam[:]
     vector_size = 100
     embeddingDict = useEmbedding(customEmbedding)
-    def oneHotTrain(trainingData,spamData,vector_size,epochs,lr):
+    word2vec_model = NeuralNetwork(1)
+    one_hot_model = NeuralNetwork(1)
+    wordProbHam,wordProbSpam = None,None
+    mostCommonWords = None
+    priorSpam = 0.5
+    def oneHotTrain(trainingData,spamData,valData,valSpam,vector_size,epochs,lr,plot_bool):
         global mostCommonWords
         mostCommonWords = getMostCommonWords(trainingData,vector_size)
-        oneHotData = list(oneHotEncode(trainingData,mostCommonWords).values())
-        resultArr = neuralNetwork(oneHotData,spamData,lr,epochs)
-        global oneHotWeights
-        oneHotWeights = resultArr[0]
-        global oneHotBias
-        oneHotBias = resultArr[1]
-    def naiveBayesTrain(trainingData,spamData,wordNum):
+        oneHotTrain = list(oneHotEncode(trainingData,mostCommonWords).values())
+        oneHotVal = list(oneHotEncode(valData,mostCommonWords).values())
+        global one_hot_model
+        one_hot_model.train_network(epochs,oneHotTrain,spamData,lr,oneHotVal,valSpam)
+        if plot_bool:
+            plot(word2vec_model.error,word2vec_model.error_val,epochs)
+    def naiveBayesTrain(trainingData,spamData,wordNum,inputSpamPrior):
+        global priorSpam
+        priorSpam = inputSpamPrior
         resultArr = trainModel(trainingData,spamData,wordNum)
         global wordProbHam 
         wordProbHam= resultArr[0]
         global wordProbSpam
         wordProbSpam = resultArr[1]
-    def word2vecTrain(trainingData,spamData,epochs,lr):
+    def word2vecTrain(trainingData,spamData,valData,valSpam,epochs,lr,plot_bool):
         trainSentences = sentenceEmbedding(trainingData,spamData,embeddingDict,100)
-        resultArr = neuralNetwork(trainSentences,spamData,lr,epochs)
-        global word2vecWeights
-        word2vecWeights = resultArr[0]
-        global word2vecBias
-        word2vecBias = resultArr[1]
-    def useOneHot(weights,bias,message):
+        valSentences = sentenceEmbedding(valData,valSpam,embeddingDict,100)
+        global word2vec_model
+        word2vec_model.train_network(epochs,trainSentences,spamData,lr,valSentences,valSpam)
+        if plot_bool:
+            plot(word2vec_model.error,word2vec_model.error_val,epochs)
+    def useOneHot(model,message):
         global mostCommonWords
         message = loadMessage(message)
         oneHotData = oneHotEncode2(message,mostCommonWords)
-        return sigmoid(getOutput(oneHotData,weights,bias))
-    def useWord2Vec(weights,bias,message):
+        return sigmoid(getOutput(oneHotData,model.weight_matrix,model.bias_vector))
+    def useWord2Vec(model,message):
         message = loadMessage(message)
         wordVector = messageEmbedding(message,embeddingDict)
-        return sigmoid(getOutput(wordVector,weights,bias))
+        return sigmoid(getOutput(wordVector,model.weight_matrix,model.bias_vector))
             
     def plt_style():
         plt.rcParams['figure.autolayout'] = True
@@ -135,16 +140,17 @@
         plt.rcParams['lines.markersize'] = 6
         plt.rcParams['lines.markerfacecolor'] = 'white'
         plt.rcParams['mathtext.fontset'] = 'cm'
-    def plot(error,epochs):
+    def plot(error,error_val,epochs):
         plt_style()
         fig,ax = plt.subplots()
         ax.set_xlabel('Epoch')
         ax.set_ylabel('Training Loss')
-        ax.plot(error,range(epochs))
-        display(fig)
-    naiveBayesTrain(trainingData,spamData,1000)
-    word2vecTrain(trainingData,spamData2,20,0.003)
-    oneHotTrain(trainingData,spamData,vector_size,20,0.003)
+        ax.plot(range(epochs),error)
+        ax.plot(range(epochs),error_val)
+        display(fig,target="plot")
+    naiveBayesTrain(trainingData,spamData,1000,0.5)
+    word2vecTrain(trainingData,spamData2,valData,valSpam,20,0.003,False)
+    oneHotTrain(trainingData,spamData,valData,valSpam,vector_size,20,0.003,False)
     </py-script>
     <script src = "script.js"></script>
 </body>
