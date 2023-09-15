@@ -46,7 +46,7 @@
             <p class = "epoch-num">Number of epochs:</p>
             <input class ="number-input" type="number" name="" value="20" min = "0" onkeydown="this.style.width = ((this.value.length + 1) * 9) + 'px';">
             <p class = "setting">Learning Rate:</p>
-            <input class = "number-input" type="number" name="" value="0.03" onkeydown="this.style.width = ((this.value.length + 1) * 9) + 'px';">
+            <input class = "number-input" type="number" name="" value="0.003" onkeydown="this.style.width = ((this.value.length + 1) * 9) + 'px';">
             <button id = "btn-one-hot" class = "confirm-settings">Confirm and Retrain One-Hot</button>
         </p>
         <p class = "line">
@@ -54,7 +54,7 @@
             <p class = "epoch-num">Number of epochs:</p>
             <input class = "number-input" type="number" name="" value="20" min = "0" onkeydown="this.style.width = ((this.value.length + 1) * 9) + 'px';">
             <p class = "setting">Learning Rate:</p>
-            <input class = "number-input" type="number" name="" value="0.03" onkeydown="this.style.width = ((this.value.length + 1) * 9) + 'px';">
+            <input class = "number-input" type="number" name="" value="0.001" onkeydown="this.style.width = ((this.value.length + 1) * 9) + 'px';">
             <p class = "add-hidden">Add hidden layer</p>
             <input id = "checkbox-word2vec" class = "hidden-layer" type="checkbox" name="" value="">
             <p class = "hidden-nodes-num hidden-word2vec">Number of nodes in hidden layer:</p>
@@ -62,6 +62,7 @@
             <button id = "btn-word2vec" class = "confirm-settings">Confirm and Retrain Word2Vec</button>
         </p>
     </div>
+    <button class = "close-btn" id = "close-plot">X</button>
     <py-script> 
     import numpy as np
     from word2vec import sentenceEmbedding, useEmbedding, messageEmbedding
@@ -95,14 +96,16 @@
     mostCommonWords = None
     priorSpam = 0.5
     def oneHotTrain(trainingData,spamData,valData,valSpam,vector_size,epochs,lr,plot_bool):
+        print(lr)
         global mostCommonWords
         mostCommonWords = getMostCommonWords(trainingData,vector_size)
+        print(mostCommonWords)
         oneHotTrain = list(oneHotEncode(trainingData,mostCommonWords).values())
         oneHotVal = list(oneHotEncode(valData,mostCommonWords).values())
         global one_hot_model
         one_hot_model.train_network(epochs,oneHotTrain,spamData,lr,oneHotVal,valSpam)
         if plot_bool:
-            plot(word2vec_model.error,word2vec_model.error_val,epochs)
+            plot(one_hot_model.error,one_hot_model.error_val,epochs)
     def naiveBayesTrain(trainingData,spamData,wordNum,inputSpamPrior):
         global priorSpam
         priorSpam = inputSpamPrior
@@ -149,8 +152,8 @@
         ax.plot(range(epochs),error_val)
         display(fig,target="plot")
     naiveBayesTrain(trainingData,spamData,1000,0.5)
-    word2vecTrain(trainingData,spamData2,valData,valSpam,20,0.003,False)
     oneHotTrain(trainingData,spamData,valData,valSpam,vector_size,20,0.003,False)
+    word2vecTrain(trainingData,spamData2,valData,valSpam2,20,0.001,False)
     </py-script>
     <script src = "script.js"></script>
 </body>

@@ -59,7 +59,6 @@ def useModel(testData,spamTestList,wordProbHam,wordProbSpam):
     accuracy = correctCount/(incorrectCount+correctCount)
     return accuracy
 def analyseMsg(wordProbHam,wordProbSpam,message,priorSpam):
-    print(priorSpam)
     message = loadMessage(message)
     message_words = message.split(' ')
     hamProb = 1-priorSpam

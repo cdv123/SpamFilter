@@ -12,6 +12,7 @@ const naiveBayesBtn = document.getElementById("btn-naive-bayes")
 const oneHotBtn = document.getElementById("btn-one-hot")
 const word2vecBtn = document.getElementById("btn-word2vec")
 const settingInput = document.querySelectorAll("input")
+const closePlot = document.getElementById("close-plot")
 function createObject(object, variableName){
     globalThis[variableName] = object
 }
@@ -29,19 +30,29 @@ oneHotBtn.addEventListener("click", () => {
     let valData = pyscript.interpreter.globals.get('valData')
     let valSpam = pyscript.interpreter.globals.get('valSpam')
     let spamData = pyscript.interpreter.globals.get('spamData')
-    oneHotTrain(trainingData,spamData,valData,valSpam,parseInt(settingInput[3].value),parseInt(settingInput[4].value),parseInt(settingInput[5].value),true)
+    oneHotTrain(trainingData,spamData,valData,valSpam,parseInt(settingInput[3].value),parseInt(settingInput[4].value),parseFloat(settingInput[5].value),true)
+    closePlot.style.display = "block"
+    const plot = document.getElementById("plot")
+    closePlot.addEventListener("click",() => {
+        plot.removeChild(plot.firstChild)
+    })
     console.log("done")
 })
 word2vecBtn.addEventListener("click", () => {
-    let valData = pyscirpt.interpreter.globals.get('valData')
-    let valSpam = pyscirpt.interpreter.globals.get('valSpam')
+    let valData = pyscript.interpreter.globals.get('valData')
+    let valSpam = pyscript.interpreter.globals.get('valSpam2')
     let word2vecTrain = pyscript.interpreter.globals.get('word2vecTrain')
     let trainingData = pyscript.interpreter.globals.get('trainingData')
-    let spamData = pyscript.interpreter.globals.get('spamData')
+    let spamData = pyscript.interpreter.globals.get('spamData2')
     // if (checkBoxWord2Vec.checked){
-
-    // }
-    word2vecTrain(trainingData,spamData,valData,valSpam,parseInt(settingInput[6].value),parseInt(settingInput[7].value),true)
+        
+        // }
+    word2vecTrain(trainingData,spamData,valData,valSpam,parseInt(settingInput[6].value),parseFloat(settingInput[7].value),true)
+    closePlot.style.display = "block"
+    const plot = document.getElementById("plot")
+    closePlot.addEventListener("click",() => {
+        plot.removeChild(plot.firstChild)
+    })
     console.log("done")
 })
 evalBtn.addEventListener("click", () => {
@@ -68,7 +79,7 @@ checkBoxWord2Vec.addEventListener("click", () => {
         for (let i = 0; i<hiddenWord2Vec.length; i++){
             hiddenWord2Vec[i].style.display = "none"
         }
-        settingInput[7].value = 0.03
+        settingInput[7].value = 0.001
     }
 })
 function showX(){

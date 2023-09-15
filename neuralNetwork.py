@@ -7,13 +7,11 @@ from simplifyDataset import convertSpamToBinary,loadSMS2
 class NeuralNetwork:    
     def __init__(self,layer_num):
         self.layer_num = layer_num
+    def train_network(self,epochs,training_data,result_data,lr,val_data,val_spam,nodes_num=0):
         self.weight_matrix = 0
         self.weight_vector = 0
         self.bias = 0
         self.bias_vector = 0
-        self.error = []
-        self.error_val = []
-    def train_network(self,epochs,training_data,result_data,lr,val_data,val_spam,nodes_num=0):
         vector_size = len(training_data[0])
         self.error = [0]*epochs
         self.error_val = [0]*epochs
@@ -138,18 +136,25 @@ def BCEgrad(y,yhat):
 
 # trainingData,spamData = loadSMS2('SMSSpamCollection.txt')
 # valData,spamVal = loadSMS2('SMSVal.txt')
+# spamVal = convertSpamToBinary(spamVal)
 # spamData = convertSpamToBinary(spamData)
 # vector_size = 100
 # embeddingDict = useEmbedding2()
-# trainSentences = sentenceEmbedding(trainingData,spamData,embeddingDict,100)
+# # trainSentences = sentenceEmbedding(trainingData,spamData,embeddingDict,100)
+# # valSentences = sentenceEmbedding(valData,spamVal,embeddingDict,100)
 # mostCommonWords = getMostCommonWords(trainingData,vector_size)
 # trainSentences = list(oneHotEncode(trainingData,mostCommonWords).values())
-# valSentences = list(oneHotEncode)
+# valSentences = list(oneHotEncode(valData,mostCommonWords).values())
 # testData, spamTest = loadSMS2('SMSTest.txt')
 # spamTest = convertSpamToBinary(spamTest)
-# testSentences = sentenceEmbedding(testData,spamTest,embeddingDict,100)
+# # testSentences = sentenceEmbedding(testData,spamTest,embeddingDict,100)
 # testSentences = list(oneHotEncode(testData,mostCommonWords).values())
-# network = NeuralNetwork(2)
-# network.train_network(10,trainSentences,spamData,0.00002,10)
-# network.train_network(20,trainSentences,spamData,0.0004,9)
+# network = NeuralNetwork(1)
+# network2 = NeuralNetwork(1)
+# network.train_network(20,trainSentences,spamData,0.003,valSentences,spamVal)
+# # network.train_network(20,trainSentences,spamData,0.0004,9)
 # print(network.test_network(testSentences,spamTest))
+# plt.plot(range(20),network.error, label = "Training Loss")
+# plt.plot(range(20),network.error_val, label = "Validation Loss")
+# plt.legend()
+# plt.show()

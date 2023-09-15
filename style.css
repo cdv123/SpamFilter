@@ -26,6 +26,13 @@ h1{
     margin-left: 32%;
     font-size: 40px;
 }
+#close-plot{
+    z-index: 53;
+    display: none;
+    position: fixed;
+    top: 10%;
+    left: 20%;
+}
 #msg-input{
     margin-left: 30%;
     margin-top: 2%;
