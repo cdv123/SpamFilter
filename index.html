@@ -85,9 +85,7 @@
     trainingData,spamData = loadSMS(trainingText)
     valData,valSpam = loadSMS(valText)
     spamData = convertSpamToBinary(spamData)
-    spamData2 = spamData[:]
     valSpam = convertSpamToBinary(valSpam)
-    valSpam2 = valSpam[:]
     vector_size = 100
     embeddingDict = useEmbedding(customEmbedding)
     word2vec_model = NeuralNetwork(1)
@@ -96,10 +94,8 @@
     mostCommonWords = None
     priorSpam = 0.5
     def oneHotTrain(trainingData,spamData,valData,valSpam,vector_size,epochs,lr,plot_bool):
-        print(lr)
         global mostCommonWords
         mostCommonWords = getMostCommonWords(trainingData,vector_size)
-        print(mostCommonWords)
         oneHotTrain = list(oneHotEncode(trainingData,mostCommonWords).values())
         oneHotVal = list(oneHotEncode(valData,mostCommonWords).values())
         global one_hot_model
@@ -153,7 +149,7 @@
         display(fig,target="plot")
     naiveBayesTrain(trainingData,spamData,1000,0.5)
     oneHotTrain(trainingData,spamData,valData,valSpam,vector_size,20,0.003,False)
-    word2vecTrain(trainingData,spamData2,valData,valSpam2,20,0.001,False)
+    word2vecTrain(trainingData,spamData,valData,valSpam,20,0.001,False)
     </py-script>
     <script src = "script.js"></script>
 </body>

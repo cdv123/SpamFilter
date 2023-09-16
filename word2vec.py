@@ -48,10 +48,8 @@ def sentenceEmbedding(data,spamList,word2vec,vector_size):
             except:
                 pass
         if length ==0:
-            data.pop(i)
-            spamList.pop(i)
-            dataLength-=1
-            i-=1
+            sentence = np.zeros(vector_size)
+            sentenceEmbeddings.append(sentence)
         else:
             for dim in sentence:
                 dim = dim/length

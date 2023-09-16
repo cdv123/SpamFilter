@@ -40,10 +40,10 @@ oneHotBtn.addEventListener("click", () => {
 })
 word2vecBtn.addEventListener("click", () => {
     let valData = pyscript.interpreter.globals.get('valData')
-    let valSpam = pyscript.interpreter.globals.get('valSpam2')
+    let valSpam = pyscript.interpreter.globals.get('valSpam')
     let word2vecTrain = pyscript.interpreter.globals.get('word2vecTrain')
     let trainingData = pyscript.interpreter.globals.get('trainingData')
-    let spamData = pyscript.interpreter.globals.get('spamData2')
+    let spamData = pyscript.interpreter.globals.get('spamData')
     // if (checkBoxWord2Vec.checked){
         
         // }
