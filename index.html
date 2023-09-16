@@ -14,7 +14,7 @@
         packages= ["numpy","matplotlib"]
         [[fetch]]
         from = "./"
-        files =["numpyNetwork.py", "word2vec.py", "simplifyDataset.py", "numpyNetwork.py", "oneHot.py","naiveBayesMethod.py","neuralNetwork.py"]
+        files =["word2vec.py", "simplifyDataset.py","oneHot.py","naiveBayesMethod.py","neuralNetwork.py","wordEmbedding.py"]
     </py-config>
 </head>
 <body>
@@ -67,7 +67,6 @@
     import numpy as np
     from word2vec import sentenceEmbedding, useEmbedding, messageEmbedding
     from oneHot import oneHotEncode,getMostCommonWords,oneHotEncode2
-    from numpyNetwork import neuralNetwork,getOutput, sigmoid
     from simplifyDataset import loadSMS,convertSpamToBinary,loadMessage
     from naiveBayesMethod import trainModel, analyseMsg
     from pyodide.http import open_url
@@ -110,22 +109,29 @@
         wordProbHam= resultArr[0]
         global wordProbSpam
         wordProbSpam = resultArr[1]
-    def word2vecTrain(trainingData,spamData,valData,valSpam,epochs,lr,plot_bool):
+    def word2vecTrain(trainingData,spamData,valData,valSpam,epochs,lr,plot_bool,layer_num,hidden_nodes_num=0):
         trainSentences = sentenceEmbedding(trainingData,spamData,embeddingDict,100)
         valSentences = sentenceEmbedding(valData,valSpam,embeddingDict,100)
         global word2vec_model
-        word2vec_model.train_network(epochs,trainSentences,spamData,lr,valSentences,valSpam)
+        if layer_num == 1:
+            word2vec_model.train_network(epochs,trainSentences,spamData,lr,valSentences,valSpam)
+        else:
+            word2vec_model.train_network(epochs,trainSentences,spamData,lr,valSentences,valSpam,hidden_nodes_num)
         if plot_bool:
             plot(word2vec_model.error,word2vec_model.error_val,epochs)
+    def skipGramTrain(trainingData,spamData,valData,valSpam,epochs,lr,plot_bool):
+        pass
     def useOneHot(model,message):
         global mostCommonWords
         message = loadMessage(message)
         oneHotData = oneHotEncode2(message,mostCommonWords)
-        return sigmoid(getOutput(oneHotData,model.weight_matrix,model.bias_vector))
+        return model.forward_pass(oneHotData)
     def useWord2Vec(model,message):
         message = loadMessage(message)
         wordVector = messageEmbedding(message,embeddingDict)
-        return sigmoid(getOutput(wordVector,model.weight_matrix,model.bias_vector))
+        if model.layer_num == 2:
+            return model.forward_pass(wordVector)[1]
+        return model.forward_pass(wordVector)
             
     def plt_style():
         plt.rcParams['figure.autolayout'] = True
@@ -149,7 +155,7 @@
         display(fig,target="plot")
     naiveBayesTrain(trainingData,spamData,1000,0.5)
     oneHotTrain(trainingData,spamData,valData,valSpam,vector_size,20,0.003,False)
-    word2vecTrain(trainingData,spamData,valData,valSpam,20,0.001,False)
+    word2vecTrain(trainingData,spamData,valData,valSpam,20,0.001,False,1)
     </py-script>
     <script src = "script.js"></script>
 </body>

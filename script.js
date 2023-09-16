@@ -44,10 +44,12 @@ word2vecBtn.addEventListener("click", () => {
     let word2vecTrain = pyscript.interpreter.globals.get('word2vecTrain')
     let trainingData = pyscript.interpreter.globals.get('trainingData')
     let spamData = pyscript.interpreter.globals.get('spamData')
-    // if (checkBoxWord2Vec.checked){
-        
-        // }
-    word2vecTrain(trainingData,spamData,valData,valSpam,parseInt(settingInput[6].value),parseFloat(settingInput[7].value),true)
+    if (checkBoxWord2Vec.checked){
+        word2vecTrain(trainingData,spamData,valData,valSpam,parseInt(settingInput[6].value),parseFloat(settingInput[7].value),true,2)
+    }
+    else{
+        word2vecTrain(trainingData,spamData,valData,valSpam,parseInt(settingInput[6].value),parseFloat(settingInput[7].value),true,1)
+    }
     closePlot.style.display = "block"
     const plot = document.getElementById("plot")
     closePlot.addEventListener("click",() => {
