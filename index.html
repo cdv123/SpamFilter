@@ -61,6 +61,20 @@
             <input class = "hidden-nodes hidden-word2vec" type="" name="" value="9" onkeydown="this.style.width = ((this.value.length + 1) * 9) + 'px';">
             <button id = "btn-word2vec" class = "confirm-settings">Confirm and Retrain Word2Vec</button>
         </p>
+        <p class = "line">
+            <p class = "model">Skip Gram Model</p>
+            <p class = "epoch-num">Number of epochs of skip gram:</p>
+            <input class = "number-input" type="number" name="" value="3" min = "0" onkeydown="this.style.width = ((this.value.length + 1) * 9) + 'px';">
+            <p class = "setting">Learning Rate of skip gram:</p>
+            <input class = "number-input" type="number" name="" value="0.0005" onkeydown="this.style.width = ((this.value.length + 1) * 9) + 'px';">
+            <p class = "setting">Dimension of Word Embedding</p>
+            <input class = "number-input" type="number" name="" value="50" onkeydown="this.style.width = ((this.value.length + 1) * 9) + 'px';">
+            <p class = "epoch-num"> Number of epochs of classification</p>
+            <input class = "number-input" type="number" name="" value="20" min = "0" onkeydown="this.style.width = ((this.value.length + 1) * 9) + 'px';">
+            <p class = "epoch-num"> Learning Rate of classification</p>
+            <input class = "number-input" type="number" name="" value="0.0004" min = "0" onkeydown="this.style.width = ((this.value.length + 1) * 9) + 'px';">
+            <button id = "btn-skip-gram" class = "confirm-settings">Train Skip Gram Model</button>
+        </p>
     </div>
     <button class = "close-btn" id = "close-plot">X</button>
     <py-script> 
@@ -75,6 +89,7 @@
     from pyodide.ffi import create_proxy
     import matplotlib.pyplot as plt
     from neuralNetwork import NeuralNetwork
+    from wordEmbedding import skip_gram_train
     trainingText = open_url("https://raw.githubusercontent.com/cdv123/SpamFilter/webversion/Dataset/SMSSpamCollection.txt")
     customEmbedding = open_url("https://raw.githubusercontent.com/cdv123/SpamFilter/webversion/Dataset/customEmbedding.txt")
     valText = open_url("https://raw.githubusercontent.com/cdv123/SpamFilter/webversion/Dataset/SMSVal.txt")
@@ -89,9 +104,12 @@
     embeddingDict = useEmbedding(customEmbedding)
     word2vec_model = NeuralNetwork(1)
     one_hot_model = NeuralNetwork(1)
+    skip_gram_model = NeuralNetwork(1)
+    wordEmbedding = {}
     wordProbHam,wordProbSpam = None,None
     mostCommonWords = None
     priorSpam = 0.5
+    skipGramTrained = 1
     def oneHotTrain(trainingData,spamData,valData,valSpam,vector_size,epochs,lr,plot_bool):
         global mostCommonWords
         mostCommonWords = getMostCommonWords(trainingData,vector_size)
@@ -119,8 +137,13 @@
             word2vec_model.train_network(epochs,trainSentences,spamData,lr,valSentences,valSpam,hidden_nodes_num)
         if plot_bool:
             plot(word2vec_model.error,word2vec_model.error_val,epochs)
-    def skipGramTrain(trainingData,spamData,valData,valSpam,epochs,lr,plot_bool):
-        pass
+    def skipGramTrain(trainingData,spamData,valData,valSpam,epochs,lr,dim,epochs2,lr2):
+        global skip_gram_model
+        global wordEmbedding
+        global skipGramTrained
+        skipGramTrained = 2
+        skip_gram_model,wordEmbedding = skip_gram_train(trainingData,spamData,valData,valSpam,epochs,lr,dim,epochs2,lr2,skip_gram_model)
+        plot(skip_gram_model.error,skip_gram_model.error_val,epochs2)
     def useOneHot(model,message):
         global mostCommonWords
         message = loadMessage(message)
@@ -131,8 +154,12 @@
         wordVector = messageEmbedding(message,embeddingDict)
         if model.layer_num == 2:
             return model.forward_pass(wordVector)[1]
+        return model.forward_pass(wordVector)   
+    def useSkipGram(model,message):
+        message = loadMessage(message)
+        wordVector = messageEmbedding(message,wordEmbedding)
+        print(wordVector)
         return model.forward_pass(wordVector)
-            
     def plt_style():
         plt.rcParams['figure.autolayout'] = True
         plt.rcParams['figure.figsize'] = [6.4, 4.8]

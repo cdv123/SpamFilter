@@ -10,6 +10,7 @@ const checkBoxWord2Vec = document.getElementById("checkbox-word2vec")
 const hiddenWord2Vec = document.querySelectorAll(".hidden-word2vec")
 const naiveBayesBtn = document.getElementById("btn-naive-bayes")
 const oneHotBtn = document.getElementById("btn-one-hot")
+const skipGramBtn = document.getElementById("btn-skip-gram")
 const word2vecBtn = document.getElementById("btn-word2vec")
 const settingInput = document.querySelectorAll("input")
 const closePlot = document.getElementById("close-plot")
@@ -45,11 +46,25 @@ word2vecBtn.addEventListener("click", () => {
     let trainingData = pyscript.interpreter.globals.get('trainingData')
     let spamData = pyscript.interpreter.globals.get('spamData')
     if (checkBoxWord2Vec.checked){
-        word2vecTrain(trainingData,spamData,valData,valSpam,parseInt(settingInput[6].value),parseFloat(settingInput[7].value),true,2)
+        word2vecTrain(trainingData,spamData,valData,valSpam,parseInt(settingInput[6].value),parseFloat(settingInput[7].value),true,2,parseInt(settingInput[9].value))
     }
     else{
         word2vecTrain(trainingData,spamData,valData,valSpam,parseInt(settingInput[6].value),parseFloat(settingInput[7].value),true,1)
     }
+    closePlot.style.display = "block"
+    const plot = document.getElementById("plot")
+    closePlot.addEventListener("click",() => {
+        plot.removeChild(plot.firstChild)
+    })
+    console.log("done")
+})
+skipGramBtn.addEventListener("click", () => {
+    let valData = pyscript.interpreter.globals.get('valData')
+    let valSpam = pyscript.interpreter.globals.get('valSpam')
+    let skipGramTrain = pyscript.interpreter.globals.get('skipGramTrain')
+    let trainingData = pyscript.interpreter.globals.get('trainingData')
+    let spamData = pyscript.interpreter.globals.get('spamData')
+    skipGramTrain(trainingData,spamData,valData,valSpam,parseInt(settingInput[10].value),parseFloat(settingInput[11].value),parseInt(settingInput[12].value),parseInt(settingInput[13].value),parseFloat(settingInput[14].value))
     closePlot.style.display = "block"
     const plot = document.getElementById("plot")
     closePlot.addEventListener("click",() => {
@@ -92,11 +107,19 @@ function showX(){
     let wordProbSpam = pyscript.interpreter.globals.get('wordProbSpam')
     let priorSpam = pyscript.interpreter.globals.get('priorSpam')
     let word2vecModel = pyscript.interpreter.globals.get('word2vec_model')
+    let skipGramModel = pyscript.interpreter.globals.get('skip_gram_model')
     message = loadMessage(message)
-    naiveBayesFun = pyscript.interpreter.globals.get('analyseMsg')
-    oneHotFun = pyscript.interpreter.globals.get('useOneHot')
-    word2vecFun = pyscript.interpreter.globals.get('useWord2Vec')
-    modelResults = [naiveBayesFun(wordProbHam,wordProbSpam,message,priorSpam),oneHotFun(oneHotModel,message),word2vecFun(word2vecModel,message)]
+    let naiveBayesFun = pyscript.interpreter.globals.get('analyseMsg')
+    let oneHotFun = pyscript.interpreter.globals.get('useOneHot')
+    let word2vecFun = pyscript.interpreter.globals.get('useWord2Vec')
+    let skipGramTrained = pyscript.interpreter.globals.get('skipGramTrained')
+    let useSkipGram = pyscript.interpreter.globals.get('useSkipGram')
+    if (skipGramTrained === 1){
+        modelResults = [naiveBayesFun(wordProbHam,wordProbSpam,message,priorSpam),oneHotFun(oneHotModel,message),word2vecFun(word2vecModel,message)]
+    }
+    else{
+        modelResults = [naiveBayesFun(wordProbHam,wordProbSpam,message,priorSpam),oneHotFun(oneHotModel,message),word2vecFun(word2vecModel,message),useSkipGram(skipGramModel,message)]
+    }
     createChart(modelResults)
 }
 function createChart(modelResults){
@@ -104,7 +127,10 @@ function createChart(modelResults){
     const margin = {top: 20, right: 30, bottom: 40, left: 90},
     width = 1000 - margin.left - margin.right,
     height = 400 - margin.top - margin.bottom;
-    const titles = ["Naive Bayes", "One Hot encoding", "word2vec"]
+    let titles = ["Naive Bayes", "One Hot encoding", "word2vec", "Skip Gram"]
+    if (modelResults.length === 3){
+        titles.splice(-1)
+    }
     let data = []
     for(let i = 0; i<titles.length;i++){
         data.push({title: titles[i], results: modelResults[i]})
