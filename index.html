@@ -158,7 +158,6 @@
     def useSkipGram(model,message):
         message = loadMessage(message)
         wordVector = messageEmbedding(message,wordEmbedding)
-        print(wordVector)
         return model.forward_pass(wordVector)
     def plt_style():
         plt.rcParams['figure.autolayout'] = True
@@ -176,9 +175,10 @@
         plt_style()
         fig,ax = plt.subplots()
         ax.set_xlabel('Epoch')
-        ax.set_ylabel('Training Loss')
-        ax.plot(range(epochs),error)
-        ax.plot(range(epochs),error_val)
+        ax.set_ylabel('Loss')
+        ax.plot(range(epochs),error, label = "Training Loss")
+        ax.plot(range(epochs),error_val, label = "Validation Loss")
+        fig.legend()
         display(fig,target="plot")
     naiveBayesTrain(trainingData,spamData,1000,0.5)
     oneHotTrain(trainingData,spamData,valData,valSpam,vector_size,20,0.003,False)

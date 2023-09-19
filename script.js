@@ -35,7 +35,8 @@ oneHotBtn.addEventListener("click", () => {
     closePlot.style.display = "block"
     const plot = document.getElementById("plot")
     closePlot.addEventListener("click",() => {
-        plot.removeChild(plot.firstChild)
+        plot.innerHTML = ''
+        closePlot.style.display = "none"
     })
     console.log("done")
 })
@@ -54,7 +55,8 @@ word2vecBtn.addEventListener("click", () => {
     closePlot.style.display = "block"
     const plot = document.getElementById("plot")
     closePlot.addEventListener("click",() => {
-        plot.removeChild(plot.firstChild)
+        plot.innerHTML = ''
+        closePlot.style.display = "none"
     })
     console.log("done")
 })
@@ -68,7 +70,8 @@ skipGramBtn.addEventListener("click", () => {
     closePlot.style.display = "block"
     const plot = document.getElementById("plot")
     closePlot.addEventListener("click",() => {
-        plot.removeChild(plot.firstChild)
+        plot.innerHTML = ''
+        closePlot.style.display = "none"
     })
     console.log("done")
 })

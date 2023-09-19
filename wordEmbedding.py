@@ -4,6 +4,7 @@ import random
 import math
 from word2vec import sentenceEmbedding
 from neuralNetwork import NeuralNetwork
+from simplifyDataset import loadSMS2,convertSpamToBinary
 #Steps
 #Read text
 #Preprocess text
@@ -113,7 +114,6 @@ def skip_gram_model(focus_matrix,context_matrix,dim,epochs,lr,text,word_dict,n_w
             # output_w= update_weights(output_w,gradx,lr)
             # hidden_w = update_weights(hidden_w,grad_hidden_w,lr)
         loss = loss/(len(focus_matrix))
-        print(epoch,loss)
         loss = 0
     return hidden_w
 def forward_pass(x,hidden_w,output_w):
@@ -220,7 +220,8 @@ def skip_gram_train(training_data,spam_data,val_data,val_spam,epochs,lr,dim,epoc
 # val_data,val_spam = loadSMS2("SMSVal.txt")
 # spam_data = convertSpamToBinary(spam_data)
 # val_spam = convertSpamToBinary(val_spam)
-# model,embedding = skip_gram_train(training_data,spam_data,val_data,val_spam,4,0.0005,50,20,0.004)
+# model = NeuralNetwork(1)
+# model,embedding = skip_gram_train(training_data,spam_data,val_data,val_spam,4,0.0005,50,20,0.004,model)
 # test_data,spam_test = loadSMS2("SMSTest.txt")
 # spam_test = convertSpamToBinary(spam_test)
 # test_sentences = sentenceEmbedding(test_data,spam_test,embedding,50)
@@ -230,8 +231,8 @@ def skip_gram_train(training_data,spam_data,val_data,val_spam,epochs,lr,dim,epoc
 # cProfile.run('skip_gram_model(focus_matrix,context_matrix,50,3,0.000015,list(new_text),unique_word_dict,20)')
 # word_embedding = {}
 # for i in unique_word_dict:
-#     word_embedding[i] = hidden_w[unique_word_dict[i]]
-# # training_data2,spam_data2 = loadSMS2('SMSSpamCollection.txt')
+    # word_embedding[i] = hidden_w[unique_word_dict[i]]
+# training_data2,spam_data2 = loadSMS2('SMSSpamCollection.txt')
 # spam_data = convertSpamToBinary(spam_data)
 # vector_size = 50    
 # trainSentences = sentenceEmbedding(training_data,spam_data,word_embedding,50)
@@ -241,7 +242,7 @@ def skip_gram_train(training_data,spam_data,val_data,val_spam,epochs,lr,dim,epoc
 # hidden_weights,hidden_bias,output_weights,output_bias = twoLayerNetwork(trainSentences,spam_data,0.0002,9,20)
 # print(bias)
 # testData, spamTest = loadSMS2('SMSTest.txt')
-# # oneHotTest = # new_text,unique_word_dict,focus_matrix,context_matrix = preprocess_text(training_data)
+# oneHotTest = # new_text,unique_word_dict,focus_matrix,context_matrix = preprocess_text(training_data)
 # mini_batches = make_mini_batches(focus_matrix,context_matrix,32)
 # hidden_w = skip_gram_model(focus_matrix,context_matrix,50,3,0.000015,list(new_text),unique_word_dict,20)
 # 
