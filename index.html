@@ -27,6 +27,10 @@
         <button class = "close-btn" id = "close-results">X</button>
         <div id = "results-chart"></div>
     </div> 
+    <div id = "loading-screen">
+        hello
+        <div class = "loader"></div>
+    </div>
     <button id = "settings-btn"> Settings</button>
     <div id = "plot"> </div>
     <div id = "config">
@@ -34,45 +38,45 @@
         <p class = "line">
             <p class = "model">Naive Bayes Model:</p>
             <p class = "epoch-num">Prior spam probability</p>
-            <input class ="number-input" type="number" name="" value="0.50" min ="0" max = "1" onkeydown="this.style.width = ((this.value.length + 1) * 9) + 'px';">
+            <input class ="number-input" type="number" name="" value="0.50" min ="0" max = "1">
             <p class = "setting">Words Used</p>
-            <input class ="number-input" type="number" name="" value="1000" onkeydown="this.style.width = ((this.value.length + 1) * 9) + 'px';">
+            <input class ="number-input" type="number" name="" value="1000">
             <button id = "btn-naive-bayes" class = "confirm-settings">Confirm and Retrain Naive Bayes</button>
         </p>
         <p class = "line">
             <p class = "model">One-Hot Model:</p>
             <p class = "epoch-num">Vector Size:</p>
-            <input class ="number-input" type="number" name="" value="100" onkeydown="this.style.width = ((this.value.length + 1) * 9) + 'px';">
+            <input class ="number-input" type="number" name="" value="100">
             <p class = "epoch-num">Number of epochs:</p>
-            <input class ="number-input" type="number" name="" value="20" min = "0" onkeydown="this.style.width = ((this.value.length + 1) * 9) + 'px';">
+            <input class ="number-input" type="number" name="" value="20" min = "0">
             <p class = "setting">Learning Rate:</p>
-            <input class = "number-input" type="number" name="" value="0.003" onkeydown="this.style.width = ((this.value.length + 1) * 9) + 'px';">
-            <button id = "btn-one-hot" class = "confirm-settings">Confirm and Retrain One-Hot</button>
+            <input class = "number-input" type="number" name="" value="0.003">
+            <button id = "btn-one-hot"class = "confirm-settings">Confirm and Retrain One-Hot</button>
         </p>
         <p class = "line">
             <p class = "model">Word2Vec Model:</p>
             <p class = "epoch-num">Number of epochs:</p>
-            <input class = "number-input" type="number" name="" value="20" min = "0" onkeydown="this.style.width = ((this.value.length + 1) * 9) + 'px';">
+            <input class = "number-input" type="number" name="" value="20" min = "0">
             <p class = "setting">Learning Rate:</p>
-            <input class = "number-input" type="number" name="" value="0.001" onkeydown="this.style.width = ((this.value.length + 1) * 9) + 'px';">
+            <input class = "number-input" type="number" name="" value="0.001">
             <p class = "add-hidden">Add hidden layer</p>
             <input id = "checkbox-word2vec" class = "hidden-layer" type="checkbox" name="" value="">
             <p class = "hidden-nodes-num hidden-word2vec">Number of nodes in hidden layer:</p>
-            <input class = "hidden-nodes hidden-word2vec" type="" name="" value="9" onkeydown="this.style.width = ((this.value.length + 1) * 9) + 'px';">
+            <input class = "hidden-nodes hidden-word2vec" type="" name="" value="9">
             <button id = "btn-word2vec" class = "confirm-settings">Confirm and Retrain Word2Vec</button>
         </p>
         <p class = "line">
             <p class = "model">Skip Gram Model</p>
             <p class = "epoch-num">Number of epochs of skip gram:</p>
-            <input class = "number-input" type="number" name="" value="3" min = "0" onkeydown="this.style.width = ((this.value.length + 1) * 9) + 'px';">
+            <input class = "number-input" type="number" name="" value="3" min = "0">
             <p class = "setting">Learning Rate of skip gram:</p>
-            <input class = "number-input" type="number" name="" value="0.0005" onkeydown="this.style.width = ((this.value.length + 1) * 9) + 'px';">
+            <input class = "number-input" type="number" name="" value="0.0005">
             <p class = "setting">Dimension of Word Embedding</p>
-            <input class = "number-input" type="number" name="" value="50" onkeydown="this.style.width = ((this.value.length + 1) * 9) + 'px';">
+            <input class = "number-input" type="number" name="" value="50">
             <p class = "epoch-num"> Number of epochs of classification</p>
-            <input class = "number-input" type="number" name="" value="20" min = "0" onkeydown="this.style.width = ((this.value.length + 1) * 9) + 'px';">
+            <input class = "number-input" type="number" name="" value="20" min = "0">
             <p class = "epoch-num"> Learning Rate of classification</p>
-            <input class = "number-input" type="number" name="" value="0.0004" min = "0" onkeydown="this.style.width = ((this.value.length + 1) * 9) + 'px';">
+            <input class = "number-input" type="number" name="" value="0.0004" min = "0">
             <button id = "btn-skip-gram" class = "confirm-settings">Train Skip Gram Model</button>
         </p>
     </div>

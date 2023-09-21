@@ -14,66 +14,80 @@ const skipGramBtn = document.getElementById("btn-skip-gram")
 const word2vecBtn = document.getElementById("btn-word2vec")
 const settingInput = document.querySelectorAll("input")
 const closePlot = document.getElementById("close-plot")
+const loadingScreen = document.getElementById("loading-screen")
 function createObject(object, variableName){
     globalThis[variableName] = object
 }
 naiveBayesBtn.addEventListener("click", () => {
+    loadingScreen.style.display = "block"
     let naiveBayesTrain = pyscript.interpreter.globals.get('naiveBayesTrain')
     let trainingData = pyscript.interpreter.globals.get('trainingData')
     let spamData = pyscript.interpreter.globals.get('spamData')
     console.log(parseFloat(settingInput[1].value))
-    naiveBayesTrain(trainingData,spamData,parseInt(settingInput[2].value),parseFloat(settingInput[1].value))
-    console.log("done")
+    setTimeout(function(){
+        loadingScreen.style.display = "none"
+        naiveBayesTrain(trainingData,spamData,parseInt(settingInput[2].value),parseFloat(settingInput[1].value))
+    },10)
 })
 oneHotBtn.addEventListener("click", () => {
+    loadingScreen.style.display = "block"
     let oneHotTrain = pyscript.interpreter.globals.get('oneHotTrain')
     let trainingData = pyscript.interpreter.globals.get('trainingData')
     let valData = pyscript.interpreter.globals.get('valData')
     let valSpam = pyscript.interpreter.globals.get('valSpam')
     let spamData = pyscript.interpreter.globals.get('spamData')
-    oneHotTrain(trainingData,spamData,valData,valSpam,parseInt(settingInput[3].value),parseInt(settingInput[4].value),parseFloat(settingInput[5].value),true)
-    closePlot.style.display = "block"
-    const plot = document.getElementById("plot")
-    closePlot.addEventListener("click",() => {
-        plot.innerHTML = ''
-        closePlot.style.display = "none"
-    })
-    console.log("done")
+    setTimeout(function(){
+        oneHotTrain(trainingData,spamData,valData,valSpam,parseInt(settingInput[3].value),parseInt(settingInput[4].value),parseFloat(settingInput[5].value),true)
+        loadingScreen.style.display = "none"
+        closePlot.style.display = "block"
+        const plot = document.getElementById("plot")
+        closePlot.addEventListener("click",() => {
+            plot.innerHTML = ''
+            closePlot.style.display = "none"
+        })
+        console.log("done")
+    },10)
 })
 word2vecBtn.addEventListener("click", () => {
+    loadingScreen.style.display = "block"
     let valData = pyscript.interpreter.globals.get('valData')
     let valSpam = pyscript.interpreter.globals.get('valSpam')
     let word2vecTrain = pyscript.interpreter.globals.get('word2vecTrain')
     let trainingData = pyscript.interpreter.globals.get('trainingData')
     let spamData = pyscript.interpreter.globals.get('spamData')
-    if (checkBoxWord2Vec.checked){
-        word2vecTrain(trainingData,spamData,valData,valSpam,parseInt(settingInput[6].value),parseFloat(settingInput[7].value),true,2,parseInt(settingInput[9].value))
-    }
-    else{
-        word2vecTrain(trainingData,spamData,valData,valSpam,parseInt(settingInput[6].value),parseFloat(settingInput[7].value),true,1)
-    }
-    closePlot.style.display = "block"
-    const plot = document.getElementById("plot")
-    closePlot.addEventListener("click",() => {
-        plot.innerHTML = ''
-        closePlot.style.display = "none"
+    setTimeout(function (){
+        if (checkBoxWord2Vec.checked){
+            word2vecTrain(trainingData,spamData,valData,valSpam,parseInt(settingInput[6].value),parseFloat(settingInput[7].value),true,2,parseInt(settingInput[9].value))
+        }
+        else{
+            word2vecTrain(trainingData,spamData,valData,valSpam,parseInt(settingInput[6].value),parseFloat(settingInput[7].value),true,1)
+        }
+        closePlot.style.display = "block"
+        const plot = document.getElementById("plot")
+        closePlot.addEventListener("click",() => {
+            plot.innerHTML = ''
+            closePlot.style.display = "none"
+        })
+        console.log("done")
     })
-    console.log("done")
 })
 skipGramBtn.addEventListener("click", () => {
+    loadingScreen.style.display = "block"
     let valData = pyscript.interpreter.globals.get('valData')
     let valSpam = pyscript.interpreter.globals.get('valSpam')
     let skipGramTrain = pyscript.interpreter.globals.get('skipGramTrain')
     let trainingData = pyscript.interpreter.globals.get('trainingData')
     let spamData = pyscript.interpreter.globals.get('spamData')
-    skipGramTrain(trainingData,spamData,valData,valSpam,parseInt(settingInput[10].value),parseFloat(settingInput[11].value),parseInt(settingInput[12].value),parseInt(settingInput[13].value),parseFloat(settingInput[14].value))
-    closePlot.style.display = "block"
-    const plot = document.getElementById("plot")
-    closePlot.addEventListener("click",() => {
-        plot.innerHTML = ''
-        closePlot.style.display = "none"
+    setTimeout(function (){
+        skipGramTrain(trainingData,spamData,valData,valSpam,parseInt(settingInput[10].value),parseFloat(settingInput[11].value),parseInt(settingInput[12].value),parseInt(settingInput[13].value),parseFloat(settingInput[14].value))
+        closePlot.style.display = "block"
+        const plot = document.getElementById("plot")
+        closePlot.addEventListener("click",() => {
+            plot.innerHTML = ''
+            closePlot.style.display = "none"
+        })
+        console.log("done")
     })
-    console.log("done")
 })
 evalBtn.addEventListener("click", () => {
     modalResults.style.display = "block"
