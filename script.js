@@ -15,17 +15,16 @@ const word2vecBtn = document.getElementById("btn-word2vec")
 const settingInput = document.querySelectorAll("input")
 const closePlot = document.getElementById("close-plot")
 const loadingScreen = document.getElementById("loading-screen")
+loadingScreen.style.display = "none"
 function createObject(object, variableName){
     globalThis[variableName] = object
 }
 naiveBayesBtn.addEventListener("click", () => {
-    loadingScreen.style.display = "block"
     let naiveBayesTrain = pyscript.interpreter.globals.get('naiveBayesTrain')
     let trainingData = pyscript.interpreter.globals.get('trainingData')
     let spamData = pyscript.interpreter.globals.get('spamData')
     console.log(parseFloat(settingInput[1].value))
     setTimeout(function(){
-        loadingScreen.style.display = "none"
         naiveBayesTrain(trainingData,spamData,parseInt(settingInput[2].value),parseFloat(settingInput[1].value))
     },10)
 })
@@ -62,6 +61,7 @@ word2vecBtn.addEventListener("click", () => {
         else{
             word2vecTrain(trainingData,spamData,valData,valSpam,parseInt(settingInput[6].value),parseFloat(settingInput[7].value),true,1)
         }
+        loadingScreen.style.display = "none"
         closePlot.style.display = "block"
         const plot = document.getElementById("plot")
         closePlot.addEventListener("click",() => {
@@ -69,7 +69,7 @@ word2vecBtn.addEventListener("click", () => {
             closePlot.style.display = "none"
         })
         console.log("done")
-    })
+    },10)
 })
 skipGramBtn.addEventListener("click", () => {
     loadingScreen.style.display = "block"
@@ -80,6 +80,7 @@ skipGramBtn.addEventListener("click", () => {
     let spamData = pyscript.interpreter.globals.get('spamData')
     setTimeout(function (){
         skipGramTrain(trainingData,spamData,valData,valSpam,parseInt(settingInput[10].value),parseFloat(settingInput[11].value),parseInt(settingInput[12].value),parseInt(settingInput[13].value),parseFloat(settingInput[14].value))
+        loadingScreen.style.display = "none"
         closePlot.style.display = "block"
         const plot = document.getElementById("plot")
         closePlot.addEventListener("click",() => {
@@ -191,4 +192,48 @@ function createChart(modelResults){
     } 
 function deleteChart(){
     d3.select('svg').remove();
+}
+class Buttons {
+    constructor (button, color, borderStyle, backgroundColor) {
+        this.button = button;
+        this.button.style.color = color;
+        this.button.style.border = borderStyle;
+        this.button.style.backgroundColor = backgroundColor;
+    }
+    colorSwitch (newColor, newBorderStyle, newBackgroundColor) {
+        this.button.style.color = newColor;
+        this.button.style.border = newBorderStyle;
+        this.button.style.backgroundColor = newBackgroundColor;
+    }
+}
+const btns = document.querySelectorAll('button')
+console.log(btns)
+const buttonList = [];
+let count = 1;
+let count2 = 1;
+
+for (let i = 0; i < btns.length; i++) {
+    buttonList.push(new Buttons(btns[i], 'black', '1px solid black', 'aquamarine'));
+    const element = buttonList[i];
+    buttonList[i].button.addEventListener('mouseout', function () { btnHover1(element); });
+    buttonList[i].button.addEventListener('mouseover', function () { btnHover2(element); });
+}
+
+console.log(buttonList)
+
+function btnHover1 (button) {
+    if (count % 2 === 1) {
+        button.colorSwitch('black', '1px solid black', 'aquamarine');
+    } else {
+        button.colorSwitch('aquamarine', '1px solid aquamarine', 'black');
+    };
+    button.button.style.borderRadius = '20px';
+}
+function btnHover2 (element) {
+    if (count % 2 === 0) {
+        element.colorSwitch('black', '1px solid black', 'aquamarine');
+    } else {
+        element.colorSwitch('aquamarine', '1px solid aquamarine', 'black');
+    }
+    element.button.style.borderRadius = '0px';
 }
