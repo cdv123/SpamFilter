@@ -1,9 +1,7 @@
 import numpy as np
 import math
-from word2vec import useEmbedding2,sentenceEmbedding
 import matplotlib.pyplot as plt 
-from oneHot import oneHotEncode,getMostCommonWords
-from simplifyDataset import convertSpamToBinary,loadSMS2
+
 class NeuralNetwork:    
     def __init__(self,layer_num):
         self.layer_num = layer_num
