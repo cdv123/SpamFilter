@@ -5,6 +5,7 @@ import math
 from word2vec import sentenceEmbedding
 from neuralNetwork import NeuralNetwork
 from simplifyDataset import loadSMS2,convertSpamToBinary
+import matplotlib.pyplot as plt
 #Steps
 #Read text
 #Preprocess text
@@ -105,7 +106,7 @@ def skip_gram_model(focus_matrix,context_matrix,dim,epochs,lr,text,word_dict,n_w
             hidden_res,final_res = forward_pass(focus_matrix[x],hidden_w,output_w)
             # softmax used as multiple classes used
             final_res = softmax(final_res)
-            # loss += loss_function(final_res,context_matrix[x])
+            loss += loss_function(final_res,context_matrix[x])
             error_der = softmax_der(final_res,context_matrix[x])
             hidden_w,output_w = back_propagation(output_w,hidden_w,focus_matrix[x],context_matrix[x],hidden_res,error_der,lr,text_size,text,n_words,word_dict)
             # gradx = compute_gradient(hidden_res,error_der)
@@ -114,6 +115,7 @@ def skip_gram_model(focus_matrix,context_matrix,dim,epochs,lr,text,word_dict,n_w
             # output_w= update_weights(output_w,gradx,lr)
             # hidden_w = update_weights(hidden_w,grad_hidden_w,lr)
         loss = loss/(len(focus_matrix))
+        print(f"training loss for epoch {epoch}", loss)
         loss = 0
     return hidden_w
 def forward_pass(x,hidden_w,output_w):
@@ -137,7 +139,8 @@ def softmax(x):
     return y
 
 def loss_function(yhat,y):
-    cost = -1*np.log(yhat[y])
+    cost = np.sum(-1*np.log(yhat[y]))
+    # print(cost)
     return cost
 
 def softmax_der(yhat,y):
@@ -203,31 +206,62 @@ def preprocess_text(training_data):
     unique_word_dict = uniqueWordDict(text)
     focus_matrix,context_matrix = make_matrices_2(unique_word_dict,pairs)
     return new_text,unique_word_dict,focus_matrix,context_matrix
+
 def make_embedding(hidden_w,unique_word_dict):
     word_embedding = {}
     for i in unique_word_dict:
         word_embedding[i] = hidden_w[unique_word_dict[i]]
     return word_embedding
-def skip_gram_train(training_data,spam_data,val_data,val_spam,epochs,lr,dim,epochs2,lr2,model):
-    new_text,unique_word_dict,focus_matrix,context_matrix = preprocess_text(val_data)
-    hidden_w = skip_gram_model(focus_matrix,context_matrix,dim,epochs,lr,list(new_text),unique_word_dict,20)
+
+def skip_gram_train(msgs, labels, epochs, dim, lrs):
+
+    # initialise data, hyperparameters and model
+    epochs_sg, epochs_spam = epochs
+    lr_sg, lr_spam = lrs
+    train_msgs, val_msgs = msgs
+    train_labels, val_labels = labels
+    model = NeuralNetwork(1)
+
+    # create context and focus matrices (context words) with one hot encoding
+    new_text,unique_word_dict,focus_matrix,context_matrix = preprocess_text(train_msgs)
+
+    # train skip gram model
+    hidden_w = skip_gram_model(focus_matrix,context_matrix,dim,epochs_sg,lr_sg,list(new_text),unique_word_dict,20)
+
+    # make word embedding dict
     word_embedding = make_embedding(hidden_w,unique_word_dict)
-    train_sentences = sentenceEmbedding(training_data,spam_data,word_embedding,dim)
-    val_sentences = sentenceEmbedding(val_data,val_spam,word_embedding,dim)
-    model.train_network(epochs2,train_sentences,spam_data,lr2,val_sentences,val_spam)
-    return model,word_embedding
+
+    # create sentence embeddings by averaging out word embeddings
+    train_sentences = sentenceEmbedding(train_msgs,word_embedding,dim)
+    val_sentences = sentenceEmbedding(val_msgs,word_embedding,dim)
+
+    # train model for spam classification
+    model.train_network(epochs_spam,train_sentences,train_labels,lr_spam,val_sentences,val_labels)
+
+    # plot training and validation loss
+    model.plot(epochs_spam)
+
+    return model, word_embedding
+"""training_data,spam_data = loadSMS2("SMSSpamCollection.txt")
+val_data,val_spam = loadSMS2("SMSVal.txt")
+# embedding = skip_gram_train(val_data, 3, 0.0004, 50)
+model = NeuralNetwork(1)
+model,embedding = skip_gram_train(training_data,spam_data,val_data,val_spam,4,0.00015,50,20,0.004,model)
+test_data,spam_test = loadSMS2("SMSTest.txt")
+test_sentences = sentenceEmbedding(test_data,embedding,50)
+print(model.test_network(test_sentences,spam_test))"""
+
 # training_data,spam_data = loadSMS2("SMSSpamCollection.txt")
 # val_data,val_spam = loadSMS2("SMSVal.txt")
-# spam_data = convertSpamToBinary(spam_data)
-# val_spam = convertSpamToBinary(val_spam)
+# # embedding = skip_gram_train(val_data, 3, 0.0004, 50)
 # model = NeuralNetwork(1)
-# model,embedding = skip_gram_train(training_data,spam_data,val_data,val_spam,4,0.0005,50,20,0.004,model)
+# model,embedding = skip_gram_train(training_data,spam_data,val_data,val_spam,2,0.000003,60,20,0.03,model)
 # test_data,spam_test = loadSMS2("SMSTest.txt")
-# spam_test = convertSpamToBinary(spam_test)
-# test_sentences = sentenceEmbedding(test_data,spam_test,embedding,50)
+# test_sentences = sentenceEmbedding(test_data,embedding,60)
 # print(model.test_network(test_sentences,spam_test))
+# plt.show()
 
-# hidden_w = skip_gram_model(focus_matrix,context_matrix,50,3,0.0004,list(new_text),unique_word_dict,20)
+# hidden_w = skip_gram_model(focus_matrix,context_matrix,50,3,0.000015,list(new_text),unique_word_dict,20)
 # cProfile.run('skip_gram_model(focus_matrix,context_matrix,50,3,0.000015,list(new_text),unique_word_dict,20)')
 # word_embedding = {}
 # for i in unique_word_dict:

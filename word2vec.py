@@ -33,7 +33,7 @@ def useEmbedding2():
             embeddingDict[word] = vector
         return embeddingDict
 #average out all word embeddings into sentence embedding
-def sentenceEmbedding(data,spamList,word2vec,vector_size):
+def sentenceEmbedding(data,word2vec,vector_size):
     sentenceEmbeddings = []
     dataLength = len(data)
     i = 0

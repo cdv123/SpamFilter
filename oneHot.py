@@ -22,8 +22,8 @@ def oneHotEncode(dataset,mostCommonWords):
         for j in range(len(mostCommonWords)):
             if mostCommonWords[j] in row:
                 oneHot[i][j] = 1
-    return oneHot
-    
+    return oneHot.values()
+
 def oneHotEncode2(message,mostCommonWords):
     oneHot = [0]*len(mostCommonWords)
     messageWords = message.split(' ')

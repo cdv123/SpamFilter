@@ -13,6 +13,7 @@ from wordEmbedding import skip_gram_train
 from simplifyDataset import loadSMS2, loadMessage
 from naiveBayesMethod import trainModel
 from oneHot import oneHotEncode, getMostCommonWords
+from word2vec import useEmbedding2, sentenceEmbedding
 
 # checks if data is of right length and labels of right format (1 or 0)
 
@@ -62,7 +63,7 @@ def check_dataset_one_hot(msgs, dim):
 
     assert len(most_common_words) == dim, "dictionary of most common words equals to dimension"
 
-    one_hot_msgs = oneHotEncode(train_msgs, most_common_words)
+    one_hot_msgs = oneHotEncode(msgs, most_common_words)
 
     # check vectors are of the right dimension
     right_dim = True
@@ -72,7 +73,17 @@ def check_dataset_one_hot(msgs, dim):
 
     assert right_dim, "dimension of vector should be of the specified dimension"
 
-    assert len(one_hot_msgs) == len(train_msgs), "there should be the same number of one hot encoded msgs as input msgs"
+    assert len(one_hot_msgs) == len(msgs), "there should be the same number of one hot encoded msgs as input msgs"
+
+    correctness = True
+    for i, vector in enumerate(one_hot_msgs):
+        new_msg = [most_common_words[index] for index, val in enumerate(vector) if val == 1]
+        msgs[i].split(" ")
+        for word in new_msg:
+            if word not in msgs[i]:
+                correctness = False
+
+    assert correctness, "one hot encoded words should be subsets of messages"
 
     return one_hot_msgs
 
@@ -112,6 +123,51 @@ def check_naive_bayes(messages, labels, word_num):
     
     assert accuracy > 0.90, "accuracy should be at least 90%"
 
+def check_word2vec(msgs):
+
+    dim = 100
+    embedding_dict = useEmbedding2()
+    for word in embedding_dict:
+        assert len(embedding_dict[word]) == dim, f"each embedding should have dimension specified, embedding for {word} incorrect"
+
+    train_msgs, val_msgs, test_msgs = msgs
+    train_embeddings = sentenceEmbedding(train_msgs, embedding_dict, dim)
+    assert len(train_embeddings) == len(train_msgs)
+
+    val_embeddings = sentenceEmbedding(val_msgs, embedding_dict, dim)
+    assert len(val_embeddings) == len(val_msgs)
+
+    test_embeddings = sentenceEmbedding(test_msgs, embedding_dict, dim)
+    assert len(test_embeddings) == len(test_msgs)
+
+    return train_embeddings, val_embeddings, test_embeddings
+
+def check_skip_gram(messages, labels, epochs, dim, lrs):
+
+    test_msgs = messages[-1]
+    test_labels = labels[-1]
+    messages = messages[:2]
+    labels = labels[:2]
+
+    # use word embeddings for spam classification 
+    model, embedding = skip_gram_train(messages, labels, epochs, dim, lrs)
+
+    # test model
+    for word in embedding:
+        assert len(embedding[word]) == dim, f"word embeddings created should be of specified dimension, embedding for {word} incorrect"
+
+    # get sentence embeddings for testing data
+    test_sentences = sentenceEmbedding(test_msgs, embedding, dim)
+    accuracy = model.test_network(test_sentences,test_labels)   
+    print("the accuracy of the model is:", accuracy) 
+    assert accuracy > 0.9, "accuracy of model should be at least 90%"
+
+# def check_one_layer(messages, labels, dims, lrs, embeddings):
+#     pass
+
+# def check_two_layer(messages, labels, dims, lrs):
+#     pass
+
 if __name__ == "__main__":
 
     training_length = 3498
@@ -119,6 +175,9 @@ if __name__ == "__main__":
     testing_length = 1006
     word_num = 1000
     dim = 300
+    dim_sg = 60
+    epochs_sg = (2, 20)
+    lr_sg = (0.000003, 0.03)
 
     # test that data is loaded properly
     messages, labels = test_loading(training_length,validation_length,testing_length)
@@ -126,10 +185,14 @@ if __name__ == "__main__":
     # test naive bayes model
     check_naive_bayes(messages,labels,word_num)
 
-    check_one_hot(messages, labels, dim)
+    # test one hot encoding works as intended
+    one_hot_train, one_hot_val, one_hot_test = check_one_hot(messages, dim)
+
+    train_embeddings, val_embeddings, test_embeddings = check_word2vec(messages)
+
+    check_skip_gram(messages, labels, epochs_sg, dim_sg, lr_sg)
 
     train_msgs, val_msgs, test_msgs = messages
     train_labels, val_labels, test_labels = labels
-
 
     print("Passed all tests!")
